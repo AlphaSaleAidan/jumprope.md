@@ -124,18 +124,20 @@ message has been saved.
 
 ## 5. Does it actually work? (measured, not vibes)
 
-Method: the same scripted 80-turn session is replayed through four memory
+Method: the same scripted 80-turn session is replayed through five memory
 strategies. Questions about planted facts are asked throughout, and each
 strategy is scored on what it can still answer and what it spent. Full
 methodology and code: [`ropebench/`](ropebench/).
 
-The four strategies, in the order they appear in every chart:
+The five strategies, in the order they appear in every chart:
 
 1. **carry everything** — never delete anything (perfect memory, maximum cost)
 2. **cut oldest** — when full, delete the oldest messages
 3. **auto-summarize** — when full, compress old messages into summaries
    (what most AI tools do today)
-4. **ROPE** — this project
+4. **ROPE bound** — this project, BOUND mode (2,000-token ledger + vault)
+5. **ROPE unbound** — this project, UNBOUND mode (ledger grows freely,
+   nothing ever leaves it)
 
 ### Chart 1 — memory of old facts
 
@@ -146,20 +148,25 @@ The four strategies, in the order they appear in every chart:
 100% by definition — that's the ceiling, not a competitor. Cutting the
 oldest messages forgets a third. Auto-summarize is the striking one: it
 forgets **three out of four** old facts, because summaries eat exactly the
-things you ask about later — exact values, reasons, details. The rope
-matches the ceiling: 100%.
+things you ask about later — exact values, reasons, details. Both rope
+modes match the ceiling: bound gets there with its vault lookups (used on
+half the questions), unbound trivially — nothing ever left its ledger.
 
 ### Chart 2 — cost of the identical session
 
 <p align="center"><img src="assets/chart-cost.svg" width="920" alt="chart-cost diagram"></p>
 
-**How to read it.** Same four strategies, but now the height is the total
-token bill for the identical 80-turn session (every turn pays for whatever
-context that strategy carries). Carrying everything costs 280k — the
-worst case, and it grows quadratically with session length. The two lossy
-strategies save some cost but, per Chart 1, pay for it in memory. The rope
-is the cheapest of all four at 146k — **about half the ceiling's cost** —
-because its carried context is a dense ledger instead of a transcript.
+**How to read it.** Same five strategies, now showing the total token bill
+for the identical 80-turn session (every turn pays for whatever context
+that strategy carries). Carrying everything costs 280k and grows
+quadratically with session length. The lossy strategies save some cost
+but, per Chart 1, pay for it in memory. **Bound rope is the cheapest of
+all five at 149k — about half the ceiling** — because its carried context
+is a capped dense ledger. The green bar is the honest one: **unbound rope
+costs 499k here**, because this benchmark feeds pre-distilled events — a
+stream with no filler for unbound mode to delete. Its economics win
+against real chat transcripts (measured separately: post-clear payloads of
+17–18%), and this gap is filed as benchmark work B5.
 
 ### Chart 3 — the bottom line (memory per token spent)
 
@@ -168,10 +175,13 @@ because its carried context is a dense ledger instead of a transcript.
 **How to read it.** This chart divides Chart 1 by Chart 2: how much correct
 memory does each dollar of tokens buy? It's the single number that captures
 the trade-off — a strategy could cheat Chart 1 by hoarding everything, or
-cheat Chart 2 by deleting everything, but not this one. The rope delivers
-**6.4 accuracy points per 10k tokens, 1.8× better than carrying everything**
-(3.6) and well ahead of both lossy baselines. This is the claim of the whole
-project in one bar.
+cheat Chart 2 by deleting everything, but not this one. **Bound rope
+delivers 6.4 accuracy points per 10k tokens — 1.8× better than carrying
+everything** (3.6) and well ahead of both lossy baselines. Unbound rope
+scores 2.0 on this stream for the reason Chart 2 explains: it buys perfect
+verbatim recall, and on a pre-distilled stream that premium shows. Pick by
+Chart 3 when cost rules; pick unbound when a single missed lookup costs
+more than tokens do.
 
 ### Predictions vs. measurements
 
@@ -179,7 +189,7 @@ project in one bar.
 |---|---|---|---|
 | Dense notation saves tokens | ≥40% vs prose | 42.1% | pass |
 | Post-clear payload is small | <20% of full history | 17–18% | pass |
-| Beats lossy baselines on old facts, cheaper than the ceiling | — | 100% vs 67/24, at 52% cost | pass |
+| Beats lossy baselines on old facts, cheaper than the ceiling | — | 100% vs 67/24, at 53% cost (bound) | pass |
 | A cold session can recover vaulted facts through the index | ≥19/20 | 20/20 | pass |
 | A live LLM keeps ≥90% of its ceiling accuracy on the rope | at ≤35% of tokens | **pending — next phase** | — |
 

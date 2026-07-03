@@ -1,31 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 452" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
 <rect width="900" height="452" rx="18" fill="#0B1220"/>
 <text x="70" y="44" fill="#E7EEF9" font-size="22" font-weight="700">Old facts still answerable</text>
-<text x="70" y="70" fill="#93A4C3" font-size="14">Questions about facts planted 40+ turns earlier · same 80-turn session, four memory strategies</text>
-<defs><linearGradient id="hero" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#60A5FA"/><stop offset="1" stop-color="#3B82F6"/></linearGradient></defs>
-<line x1="70" y1="388.0" x2="830" y2="388.0" stroke="#22314F" stroke-width="1" stroke-dasharray="none"/>
-<text x="60" y="392.0" fill="#93A4C3" font-size="12" text-anchor="end">0</text>
-<line x1="70" y1="321.5" x2="830" y2="321.5" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
-<text x="60" y="325.5" fill="#93A4C3" font-size="12" text-anchor="end">25</text>
-<line x1="70" y1="255.0" x2="830" y2="255.0" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
-<text x="60" y="259.0" fill="#93A4C3" font-size="12" text-anchor="end">50</text>
-<line x1="70" y1="188.5" x2="830" y2="188.5" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
-<text x="60" y="192.5" fill="#93A4C3" font-size="12" text-anchor="end">75</text>
+<text x="70" y="70" fill="#93A4C3" font-size="14">Questions about facts planted 40+ turns earlier · same 80-turn session, five memory strategies</text>
+<defs><linearGradient id="hero" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#60A5FA"/><stop offset="1" stop-color="#3B82F6"/></linearGradient><linearGradient id="hero2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34D399"/><stop offset="1" stop-color="#10B981"/></linearGradient></defs>
+<line x1="70" y1="374.0" x2="830" y2="374.0" stroke="#22314F" stroke-width="1" stroke-dasharray="none"/>
+<text x="60" y="378.0" fill="#93A4C3" font-size="12" text-anchor="end">0</text>
+<line x1="70" y1="311.0" x2="830" y2="311.0" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
+<text x="60" y="315.0" fill="#93A4C3" font-size="12" text-anchor="end">25</text>
+<line x1="70" y1="248.0" x2="830" y2="248.0" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
+<text x="60" y="252.0" fill="#93A4C3" font-size="12" text-anchor="end">50</text>
+<line x1="70" y1="185.0" x2="830" y2="185.0" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
+<text x="60" y="189.0" fill="#93A4C3" font-size="12" text-anchor="end">75</text>
 <line x1="70" y1="122.0" x2="830" y2="122.0" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
 <text x="60" y="126.0" fill="#93A4C3" font-size="12" text-anchor="end">100</text>
-<path d="M70.0,388.0 v-256.0 q0,-10 10,-10 h90 q10,0 10,10 v256.0 z" fill="#3D4F73"/>
-<text x="125.0" y="110.0" fill="#E7EEF9" font-size="19" font-weight="700" text-anchor="middle">100%</text>
-<text x="125.0" y="412.0" fill="#93A4C3" font-size="14" text-anchor="middle">carry</text>
-<text x="125.0" y="429.0" fill="#93A4C3" font-size="14" text-anchor="middle">everything</text>
-<path d="M286.7,388.0 v-168.2 q0,-10 10,-10 h90 q10,0 10,10 v168.2 z" fill="#3D4F73"/>
-<text x="341.7" y="197.8" fill="#E7EEF9" font-size="19" font-weight="700" text-anchor="middle">67%</text>
-<text x="341.7" y="412.0" fill="#93A4C3" font-size="14" text-anchor="middle">cut</text>
-<text x="341.7" y="429.0" fill="#93A4C3" font-size="14" text-anchor="middle">oldest</text>
-<path d="M503.3,388.0 v-53.8 q0,-10 10,-10 h90 q10,0 10,10 v53.8 z" fill="#3D4F73"/>
-<text x="558.3" y="312.2" fill="#E7EEF9" font-size="19" font-weight="700" text-anchor="middle">24%</text>
-<text x="558.3" y="412.0" fill="#93A4C3" font-size="14" text-anchor="middle">auto-</text>
-<text x="558.3" y="429.0" fill="#93A4C3" font-size="14" text-anchor="middle">summarize</text>
-<path d="M720.0,388.0 v-256.0 q0,-10 10,-10 h90 q10,0 10,10 v256.0 z" fill="url(#hero)"/>
-<text x="775.0" y="110.0" fill="#60A5FA" font-size="19" font-weight="700" text-anchor="middle">100%</text>
-<text x="775.0" y="412.0" fill="#60A5FA" font-size="14" font-weight="700" text-anchor="middle">ROPE</text>
+<path d="M70.0,374.0 v-242.0 q0,-10 10,-10 h76 q10,0 10,10 v242.0 z" fill="#3D4F73"/>
+<text x="118.0" y="110.0" fill="#E7EEF9" font-size="18" font-weight="700" text-anchor="middle">100%</text>
+<text x="118.0" y="398.0" fill="#93A4C3" font-size="13.5" text-anchor="middle">carry</text>
+<text x="118.0" y="415.0" fill="#93A4C3" font-size="13.5" text-anchor="middle">everything</text>
+<path d="M236.0,374.0 v-158.8 q0,-10 10,-10 h76 q10,0 10,10 v158.8 z" fill="#3D4F73"/>
+<text x="284.0" y="193.2" fill="#E7EEF9" font-size="18" font-weight="700" text-anchor="middle">67%</text>
+<text x="284.0" y="398.0" fill="#93A4C3" font-size="13.5" text-anchor="middle">cut</text>
+<text x="284.0" y="415.0" fill="#93A4C3" font-size="13.5" text-anchor="middle">oldest</text>
+<path d="M402.0,374.0 v-50.5 q0,-10 10,-10 h76 q10,0 10,10 v50.5 z" fill="#3D4F73"/>
+<text x="450.0" y="301.5" fill="#E7EEF9" font-size="18" font-weight="700" text-anchor="middle">24%</text>
+<text x="450.0" y="398.0" fill="#93A4C3" font-size="13.5" text-anchor="middle">auto-</text>
+<text x="450.0" y="415.0" fill="#93A4C3" font-size="13.5" text-anchor="middle">summarize</text>
+<path d="M568.0,374.0 v-242.0 q0,-10 10,-10 h76 q10,0 10,10 v242.0 z" fill="url(#hero)"/>
+<text x="616.0" y="110.0" fill="#60A5FA" font-size="18" font-weight="700" text-anchor="middle">100%</text>
+<text x="616.0" y="398.0" fill="#60A5FA" font-size="13.5" font-weight="700" text-anchor="middle">ROPE</text>
+<text x="616.0" y="415.0" fill="#60A5FA" font-size="13.5" font-weight="700" text-anchor="middle">bound</text>
+<path d="M734.0,374.0 v-242.0 q0,-10 10,-10 h76 q10,0 10,10 v242.0 z" fill="url(#hero2)"/>
+<text x="782.0" y="110.0" fill="#34D399" font-size="18" font-weight="700" text-anchor="middle">100%</text>
+<text x="782.0" y="398.0" fill="#34D399" font-size="13.5" font-weight="700" text-anchor="middle">ROPE</text>
+<text x="782.0" y="415.0" fill="#34D399" font-size="13.5" font-weight="700" text-anchor="middle">unbound</text>
 </svg>

@@ -2,30 +2,35 @@
 <rect width="900" height="452" rx="18" fill="#0B1220"/>
 <text x="70" y="44" fill="#E7EEF9" font-size="22" font-weight="700">The bottom line: memory per token spent</text>
 <text x="70" y="70" fill="#93A4C3" font-size="14">Accuracy points delivered per 10,000 tokens · higher is better</text>
-<defs><linearGradient id="hero" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#60A5FA"/><stop offset="1" stop-color="#3B82F6"/></linearGradient></defs>
-<line x1="70" y1="388.0" x2="830" y2="388.0" stroke="#22314F" stroke-width="1" stroke-dasharray="none"/>
-<text x="60" y="392.0" fill="#93A4C3" font-size="12" text-anchor="end">0.0</text>
-<line x1="70" y1="321.5" x2="830" y2="321.5" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
-<text x="60" y="325.5" fill="#93A4C3" font-size="12" text-anchor="end">1.8</text>
-<line x1="70" y1="255.0" x2="830" y2="255.0" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
-<text x="60" y="259.0" fill="#93A4C3" font-size="12" text-anchor="end">3.5</text>
-<line x1="70" y1="188.5" x2="830" y2="188.5" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
-<text x="60" y="192.5" fill="#93A4C3" font-size="12" text-anchor="end">5.2</text>
+<defs><linearGradient id="hero" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#60A5FA"/><stop offset="1" stop-color="#3B82F6"/></linearGradient><linearGradient id="hero2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34D399"/><stop offset="1" stop-color="#10B981"/></linearGradient></defs>
+<line x1="70" y1="374.0" x2="830" y2="374.0" stroke="#22314F" stroke-width="1" stroke-dasharray="none"/>
+<text x="60" y="378.0" fill="#93A4C3" font-size="12" text-anchor="end">0.0</text>
+<line x1="70" y1="311.0" x2="830" y2="311.0" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
+<text x="60" y="315.0" fill="#93A4C3" font-size="12" text-anchor="end">1.8</text>
+<line x1="70" y1="248.0" x2="830" y2="248.0" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
+<text x="60" y="252.0" fill="#93A4C3" font-size="12" text-anchor="end">3.5</text>
+<line x1="70" y1="185.0" x2="830" y2="185.0" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
+<text x="60" y="189.0" fill="#93A4C3" font-size="12" text-anchor="end">5.2</text>
 <line x1="70" y1="122.0" x2="830" y2="122.0" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
 <text x="60" y="126.0" fill="#93A4C3" font-size="12" text-anchor="end">7.0</text>
-<path d="M70.0,388.0 v-126.8 q0,-10 10,-10 h90 q10,0 10,10 v126.8 z" fill="#3D4F73"/>
-<text x="125.0" y="239.2" fill="#E7EEF9" font-size="19" font-weight="700" text-anchor="middle">3.6</text>
-<text x="125.0" y="412.0" fill="#93A4C3" font-size="14" text-anchor="middle">carry</text>
-<text x="125.0" y="429.0" fill="#93A4C3" font-size="14" text-anchor="middle">everything</text>
-<path d="M286.7,388.0 v-161.0 q0,-10 10,-10 h90 q10,0 10,10 v161.0 z" fill="#3D4F73"/>
-<text x="341.7" y="205.0" fill="#E7EEF9" font-size="19" font-weight="700" text-anchor="middle">4.5</text>
-<text x="341.7" y="412.0" fill="#93A4C3" font-size="14" text-anchor="middle">cut</text>
-<text x="341.7" y="429.0" fill="#93A4C3" font-size="14" text-anchor="middle">oldest</text>
-<path d="M503.3,388.0 v-145.8 q0,-10 10,-10 h90 q10,0 10,10 v145.8 z" fill="#3D4F73"/>
-<text x="558.3" y="220.2" fill="#E7EEF9" font-size="19" font-weight="700" text-anchor="middle">4.1</text>
-<text x="558.3" y="412.0" fill="#93A4C3" font-size="14" text-anchor="middle">auto-</text>
-<text x="558.3" y="429.0" fill="#93A4C3" font-size="14" text-anchor="middle">summarize</text>
-<path d="M720.0,388.0 v-233.2 q0,-10 10,-10 h90 q10,0 10,10 v233.2 z" fill="url(#hero)"/>
-<text x="775.0" y="132.8" fill="#60A5FA" font-size="19" font-weight="700" text-anchor="middle">6.4</text>
-<text x="775.0" y="412.0" fill="#60A5FA" font-size="14" font-weight="700" text-anchor="middle">ROPE</text>
+<path d="M70.0,374.0 v-119.6 q0,-10 10,-10 h76 q10,0 10,10 v119.6 z" fill="#3D4F73"/>
+<text x="118.0" y="232.4" fill="#E7EEF9" font-size="18" font-weight="700" text-anchor="middle">3.6</text>
+<text x="118.0" y="398.0" fill="#93A4C3" font-size="13.5" text-anchor="middle">carry</text>
+<text x="118.0" y="415.0" fill="#93A4C3" font-size="13.5" text-anchor="middle">everything</text>
+<path d="M236.0,374.0 v-152.0 q0,-10 10,-10 h76 q10,0 10,10 v152.0 z" fill="#3D4F73"/>
+<text x="284.0" y="200.0" fill="#E7EEF9" font-size="18" font-weight="700" text-anchor="middle">4.5</text>
+<text x="284.0" y="398.0" fill="#93A4C3" font-size="13.5" text-anchor="middle">cut</text>
+<text x="284.0" y="415.0" fill="#93A4C3" font-size="13.5" text-anchor="middle">oldest</text>
+<path d="M402.0,374.0 v-137.6 q0,-10 10,-10 h76 q10,0 10,10 v137.6 z" fill="#3D4F73"/>
+<text x="450.0" y="214.4" fill="#E7EEF9" font-size="18" font-weight="700" text-anchor="middle">4.1</text>
+<text x="450.0" y="398.0" fill="#93A4C3" font-size="13.5" text-anchor="middle">auto-</text>
+<text x="450.0" y="415.0" fill="#93A4C3" font-size="13.5" text-anchor="middle">summarize</text>
+<path d="M568.0,374.0 v-220.4 q0,-10 10,-10 h76 q10,0 10,10 v220.4 z" fill="url(#hero)"/>
+<text x="616.0" y="131.6" fill="#60A5FA" font-size="18" font-weight="700" text-anchor="middle">6.4</text>
+<text x="616.0" y="398.0" fill="#60A5FA" font-size="13.5" font-weight="700" text-anchor="middle">ROPE</text>
+<text x="616.0" y="415.0" fill="#60A5FA" font-size="13.5" font-weight="700" text-anchor="middle">bound</text>
+<path d="M734.0,374.0 v-62.0 q0,-10 10,-10 h76 q10,0 10,10 v62.0 z" fill="url(#hero2)"/>
+<text x="782.0" y="290.0" fill="#34D399" font-size="18" font-weight="700" text-anchor="middle">2.0</text>
+<text x="782.0" y="398.0" fill="#34D399" font-size="13.5" font-weight="700" text-anchor="middle">ROPE</text>
+<text x="782.0" y="415.0" fill="#34D399" font-size="13.5" font-weight="700" text-anchor="middle">unbound</text>
 </svg>
