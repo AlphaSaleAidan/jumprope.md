@@ -23,6 +23,7 @@ def test_regime_ordering_claims() -> None:
     metrics = run_benchmark(seeds=SEEDS, n_turns=TURNS)
     full, truncate = metrics["full-history"], metrics["truncate"]
     summary, rope = metrics["summary"], metrics["rope"]
+    unbound = metrics["rope-unbound"]
 
     print("\n" + markdown(metrics))
 
@@ -48,6 +49,19 @@ def test_regime_ordering_claims() -> None:
     assert rope.accuracy() >= 0.75
     assert rope.accuracy(kind="status") == 1.0  # glyphs survive compaction
 
+    # UNBOUND mode: perfect verbatim recall — matches the oracle on every
+    # cell, with zero retrieval (nothing ever leaves the rope).
+    assert unbound.accuracy() == 1.0
+    assert unbound.accuracy(bucket="long") == 1.0
+    assert unbound.retrieval_rate == 0.0
+    # Honest cost note, asserted so nobody quietly forgets it: on a
+    # PRE-DISTILLED event stream the unbound rope costs MORE than the raw
+    # oracle (per-record structure + legend). Its cost win is against real
+    # chat transcripts (17-18% payload, measured in the adapter tests),
+    # which this event-driven scenario does not model. See ROADMAP B4/B5.
+    assert unbound.total_tokens > full.total_tokens
+    assert unbound.total_tokens > rope.total_tokens
+
 
 def test_summary_regime_fails_exactly_where_predicted() -> None:
     """The A12-adjacent claim: summarization loses trailing detail, so its
@@ -65,7 +79,7 @@ def test_report_artifacts() -> None:
     assert "| rope |" in table
     rows = csv_rows(metrics)
     assert rows.splitlines()[0].startswith("regime,probe_tag")
-    assert len(rows.splitlines()) == 1 + 4 * 26  # header + 4 regimes × 26 probes
+    assert len(rows.splitlines()) == 1 + 5 * 26  # header + 5 regimes × 26 probes
 
 
 def test_cli_scripted_run(tmp_path: Path) -> None:

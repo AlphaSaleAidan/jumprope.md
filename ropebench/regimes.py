@@ -129,13 +129,15 @@ class RopeRegime(RegimeBase):
         rope_budget_tokens: int = 600,
         jump_every_n_turns: int = 8,
         data_dir: str | Path | None = None,
+        config: JumpConfig | None = None,
     ) -> None:
         super().__init__()
         self._dir = Path(data_dir) if data_dir else Path(tempfile.mkdtemp(prefix="ropebench-"))
         self.session = JumpingRopeSession(
             self._dir,
             session_id="ropebench",
-            config=JumpConfig(
+            config=config
+            or JumpConfig(
                 rope_budget_tokens=rope_budget_tokens,
                 jump_threshold_tokens=rope_budget_tokens * 3,
                 jump_every_n_turns=jump_every_n_turns,
@@ -156,18 +158,18 @@ class RopeRegime(RegimeBase):
         kw = event.rope_kwargs
         if event.rope_section == "delta":
             self.session.record_event(
-                "delta", event.text, path=str(kw["path"]), densify=False
+                "delta", event.text, path=str(kw["path"])
             )
         elif event.rope_section == "open":
             self.session.record_event(
-                "open", event.text, priority=int(str(kw["priority"])), densify=False
+                "open", event.text, priority=int(str(kw["priority"]))
             )
         elif event.rope_section == "decision":
             self.session.record_event(
-                "decision", event.text, reason=str(kw.get("reason", "")), densify=False
+                "decision", event.text, reason=str(kw.get("reason", ""))
             )
         elif event.rope_section == "goal":
-            self.session.record_event("goal", event.text, status="pending", densify=False)
+            self.session.record_event("goal", event.text, status="pending")
             self._goal_nums[kw["goal_num"]] = self.session.rope.goals[-1].num
         elif event.rope_section == "goal_done":
             rope_num = self._goal_nums.get(kw["goal_num"])
@@ -184,10 +186,29 @@ class RopeRegime(RegimeBase):
         self.session.close()
 
 
+class RopeUnboundRegime(RopeRegime):
+    """Jumping Rope in UNBOUND mode: the rope grows as needed (still dense),
+    nothing demotes — decisions and facts stay on the rope verbatim. In a
+    chat deployment the transcript is what gets evicted; in this event-driven
+    bench the carried context is simply the rope itself."""
+
+    name = "rope-unbound"
+
+    def __init__(self, data_dir: str | Path | None = None) -> None:
+        super().__init__(data_dir=data_dir, config=JumpConfig.unbound())
+
+    def observe(self, turn: int, events: list[Event]) -> None:
+        for event in events:
+            self._record(event)
+        self.session.note_turn(" ".join(e.text for e in events))
+        # No jump: the rope is the persistent record.
+
+
 def default_regimes(budget_tokens: int = 800) -> list[RegimeBase]:
     return [
         FullHistoryRegime(),
         TruncateRegime(budget_tokens=budget_tokens),
         SummaryRegime(budget_tokens=budget_tokens),
         RopeRegime(rope_budget_tokens=600),
+        RopeUnboundRegime(),
     ]

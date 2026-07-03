@@ -50,13 +50,19 @@ Two modes:
 | full-history | 100% | 100% | 100% | 100% | 100% | 100% | 100% | 0% | 280,455 | 3.6 |
 | truncate | 91% | 100% | 100% | 67% | 92% | 88% | 94% | 0% | 201,517 | 4.5 |
 | summary | 79% | 100% | 100% | 24% | 75% | 75% | 94% | 0% | 192,357 | 4.1 |
-| **rope** | **94%** | 100% | 83% | **100%** | 100% | 79% | 100% | 56% | **145,933** | **6.4** |
+| **rope (bound)** | **95%** | 100% | 87% | **100%** | 100% | 83% | 100% | 51% | **148,607** | **6.4** |
+| rope-unbound | 100% | 100% | 100% | 100% | 100% | 100% | 100% | 0% | 498,828 | 2.0 |
 
 The story: at long distance — the regime a context strategy exists for —
-rope holds **100%** while truncation falls to 67% and summary compaction to
-24%, at ~half the oracle's token spend and the best accuracy-per-token of
-all four. The weak cell (decision recall, 79%) is localized and diagnosed:
-see `ROADMAP.md` findings B1–B3 and the fix plan.
+bound rope holds **100%** while truncation falls to 67% and summary
+compaction to 24%, at ~half the oracle's token spend and the best
+accuracy-per-token of the field. **Unbound rope matches the oracle on every
+cell** (perfect verbatim recall, zero retrievals) — and the honest cost
+number is that on this *pre-distilled* event stream it costs MORE than the
+oracle (per-record structure + legend overhead; every decision line carries
+a full ISO date). Unbound's economics win against real chat transcripts —
+17–18% payloads measured in the adapter tests — which this event-driven
+scenario does not model. Findings B1–B5 in `ROADMAP.md`.
 
 ## Run it
 
