@@ -329,9 +329,12 @@ class AiNativeProfile:
         for code, phrase in sorted(
             self.lexicon.items(), key=lambda kv: -len(kv[0])
         ):
-            # Boundary-safe (A16): '§ab' is not the code '§a'.
+            # Boundary-safe (A16): '§ab' is not the code '§a'. The
+            # replacement is escaped so phrase backslashes stay literal.
             text = re.sub(
-                re.escape(code) + r"(?![a-z])", lambda _m: phrase, text
+                re.escape(code) + r"(?![a-z])",
+                phrase.replace("\\", "\\\\"),
+                text,
             )
         return text
 

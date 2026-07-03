@@ -91,3 +91,21 @@ extra (`SentenceTransformerEmbedder`).
 Original 52 tests: green, unweakened. Adversarial: 29 tests, green,
 0 skipped, 0 xfail. `ruff check .` clean, `mypy --strict jumping_rope`
 clean. Full output in the PR.
+
+---
+
+# Round 2 — the v1.1 surface (streaming eviction, ai-native, provenance)
+
+Same rules: red test committed before every fix; zero network; verdicts below.
+
+| # | Sev | Attack | Actual (pre-fix) | Verdict |
+|---|-----|--------|------------------|---------|
+| A14 | P0 | Client system prompt through both policies | **Silently discarded** — streaming dropped it from turn 1; the bound jump dropped it at every jump. Model lost its standing instructions | **FIXED** — system messages survive first, rope second |
+| A15 | P1 | Image-only / non-text messages through streaming | **Vanished** — empty extracted text meant neither kept nor archived | **FIXED** — canonical-JSON coverage surrogate; kept until archived, then evicts like text |
+| A16 | P1 | Literal `§` content vs the ai-native dictionary | `expand()` used bare `str.replace`: literal `§ab` corrupted into dictionary phrases — including inside the vault | **FIXED** — input `§`→`⸿` sanitization + boundary-safe expansion |
+| A17 | P1 | 24 distinct repeated phrases at budget 300 | **RopeBudgetError mid-session** — the never-demotable legend dictionary AND full keyring stub lines (topic + key ≈ 25–40 tokens each) outgrew the budget | **FIXED** — dictionary capped at budget/8, digest budget scaled, tight ropes (<500) keep 0 stubs outside the keyring |
+| A18 | P2 | Anaphora: "fix that" after the referent reply evicts | HELD — a reply is always uncovered (kept) on the immediately-following call; eviction only begins one turn later | **HELD** (locked) |
+| A19 | P2 | Duplicate-content turns | Content-addressed dedup: one vault record, second occurrence gets no fresh t{n} K-line. Nothing lost; tracking gap documented as the price of crash-idempotent keys | **HELD** (documented) |
+| A20 | P2 | unbound→bound switch; v1.0 DB without the turn column; provenance stamps | Switch compacts a 40-event unbounded rope cleanly under the new cap; old DBs migrate in place (`turn=-1`); stamps parse | **HELD** (locked) |
+
+**Round 2 totals: 4 broken → 4 fixed, 3 held. Suite after round 2: 103 tests, 0 skipped, 0 xfail.**
