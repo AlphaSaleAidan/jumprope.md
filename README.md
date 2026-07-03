@@ -109,15 +109,16 @@ recovered 20 of 20 planted facts through it.
 
 <p align="center"><img src="assets/jump.svg" width="920" alt="jump diagram"></p>
 
-**How to read it.** Time flows top to bottom. During normal work (the loop)
-the model keeps writing state onto the rope, and the rope quietly spills
-overflow into the vault. When the chat history gets heavy, everything is
-erased except the rope — that is the jump, the blue band. The fresh session
-starts from the rope alone. When it hits a question the rope can't answer
-(bottom two arrows), it asks the vault and gets the original text back —
-a lookup, not a guess. In UNBOUND mode there is no discrete jump: the erase
-happens continuously, one message at a time, the moment each message has
-been saved.
+**How to read it.** Three panels, left to right in time. **Panel 1 —
+during work:** every meaningful change in the chat is copied down onto the
+rope, compressed. **Panel 2 — the jump:** the chat history is erased (the
+crossed-out card); the rope survives untouched — and because everything
+important was already on it, nothing is actually lost. **Panel 3 — the
+fresh session:** the model resumes from the rope alone, and when it needs
+an old detail the rope doesn't carry, it fetches the original text from the
+vault by key — a lookup, not a guess. In UNBOUND mode there is no discrete
+jump: panel 2 happens continuously, one message at a time, the moment each
+message has been saved.
 
 ---
 
