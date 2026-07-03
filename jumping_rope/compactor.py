@@ -14,13 +14,72 @@ Policy (deterministic):
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
-from .rope import RopeFile
+from .rope import KeyItem, RopeFile
 from .tokens import count_tokens
 from .turbovec import TurboVec
 
 _TOPIC_WORDS = 6
+
+# -- keyring digests (adversarial finding A1a) --------------------------------
+# A keyring stub must carry a lexical handle for every member it hides,
+# or the member is unreachable to a literal cold reader. The digest is a
+# comma-joined list of one significant token per transitive member,
+# deduplicated, newest-first under a hard token budget with a "+n" overflow
+# marker.
+KEYRING_PREFIX = "KR:"
+DIGEST_TOKEN_BUDGET = 48
+_OVERFLOW_MARK = re.compile(r"\s*\+\d+$")
+_DROP_TOKEN = re.compile(r"^(?:[DOGK]\d+|P[0-3]|KR|\d+|\d{4}-\d{2}-\d{2})$", re.IGNORECASE)
+_DIGEST_STOP = frozenset(
+    "the a an and or of to in on for with keyring demoted keys mod add del "
+    "routine note number touching".split()
+)
+_WORD_SPLIT = re.compile(r"[^0-9A-Za-z_-]+")
+_TAG_TOKEN = re.compile(r"^[A-Za-z]{1,4}-?\d{1,4}$")
+
+
+def digest_tokens(topic: str) -> list[str]:
+    """One significant token per member topic; keyrings flatten their own."""
+    if topic.startswith(KEYRING_PREFIX):
+        body = _OVERFLOW_MARK.sub("", topic[len(KEYRING_PREFIX):])
+        return [t for t in body.split(",") if t]
+    words = [
+        w
+        for w in _WORD_SPLIT.split(topic)
+        if w and not _DROP_TOKEN.match(w) and w.lower() not in _DIGEST_STOP
+    ]
+    if not words:
+        return []
+    for word in words:  # prefer tag-like tokens (F07, CVE-123) — most distinctive
+        if _TAG_TOKEN.match(word):
+            return [word]
+    return [words[0]]
+
+
+def build_keyring_digest(members: list[KeyItem]) -> str:
+    """Digest topic for a keyring bundling ``members`` (oldest → newest)."""
+    seen: set[str] = set()
+    tokens: list[str] = []
+    for member in members:
+        for token in digest_tokens(member.topic):
+            lowered = token.lower()
+            if lowered not in seen:
+                seen.add(lowered)
+                tokens.append(token)
+    kept: list[str] = []
+    for token in reversed(tokens):  # newest members win the budget
+        candidate = [token, *kept]
+        if count_tokens(KEYRING_PREFIX + ",".join(candidate)) > DIGEST_TOKEN_BUDGET:
+            break
+        kept = candidate
+    dropped = len(tokens) - len(kept)
+    digest = KEYRING_PREFIX + ",".join(kept)
+    if dropped:
+        digest += f" +{dropped}"
+    return digest
 
 
 class RopeBudgetError(RuntimeError):
@@ -114,7 +173,7 @@ class Compactor:
             created_at=rope.timestamp,
         )
         rope.keys = rope.keys[-keep_newest:]
-        rope.add_key(topic=f"keyring:{len(old)} demoted keys", turbovec_id=key)
+        rope.add_key(topic=build_keyring_digest(old), turbovec_id=key)
         return True
 
     def enforce(self, rope: RopeFile) -> list[Demotion]:

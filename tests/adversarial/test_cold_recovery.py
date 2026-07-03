@@ -93,8 +93,25 @@ class ColdAgent:
         return topic.startswith("KR:") or topic.startswith("keyring")
 
     def answer(self, question: str) -> tuple[str, str] | None:
-        """Return (path, evidence) or None. Paths: direct | keyring | search."""
+        """Return (path, evidence) or None.
+
+        Paths: rope (verbatim in carried context) | direct | keyring | search.
+        """
         qtok = _tokens(question)
+
+        # (0): the carried rope itself — a cold reader has it in context.
+        # Best-matching line wins, and only on ≥2 shared content words: a
+        # single generic-token overlap (e.g. "queue" or the LEGEND's
+        # "migration") is not an answer even for a literal reader.
+        best_line, best_overlap = "", 0
+        for line in self.rope_text.splitlines():
+            if line.startswith(("## ", "# ", "K")):
+                continue
+            overlap = len(_tokens(line) & qtok)
+            if overlap > best_overlap:
+                best_overlap, best_line = overlap, line
+        if best_overlap >= 2:
+            return ("rope", best_line)
 
         # (a)/(b): direct stubs first.
         for stub in self.rope.keys:
@@ -224,7 +241,7 @@ def test_a1_cold_agent_recovers_facts_through_keyring(
 
     recovered = len(paths)
     by_path = {p: sorted(t for t, q in paths.items() if q == p)
-               for p in ("direct", "keyring", "search")}
+               for p in ("rope", "direct", "keyring", "search")}
     print(f"[a1] recovered {recovered}/20; paths: "
           + ", ".join(f"{p}={len(v)}" for p, v in by_path.items()))
     for p, v in by_path.items():
