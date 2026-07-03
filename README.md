@@ -233,6 +233,20 @@ pip install -e ./ropebench --no-deps
 ropebench run --mode scripted --seeds 3 --turns 80
 ```
 
+## Agent brain
+
+Agents working in this repo get project skills from
+[`.claude/skills/`](.claude/skills/):
+
+- **`jumping-rope`** — the system's own skill: maintain `ROPE.md`
+  continuously, archive to the vault, re-seed from the rope after any
+  context clear (rope creation and storage, dogfooded).
+- **`ponytail` + review/audit/debt/gain/help** — vendored from
+  [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)
+  (MIT): the lazy-senior-dev discipline. All rope/storage code in this repo
+  is written under it — simplest solution that works, stdlib before
+  dependencies, one line before fifty.
+
 Development plan (what's next, known limits, the live-model phase):
 [`ropebench/ROADMAP.md`](ropebench/ROADMAP.md). Imported with full git
 history from [jumping-rope](https://github.com/AlphaSaleAidan/jumping-rope)
