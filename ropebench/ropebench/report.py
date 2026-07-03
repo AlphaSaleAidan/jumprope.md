@@ -7,7 +7,7 @@ import io
 
 from .runner import BUCKETS, KINDS, RegimeMetrics
 
-_ORDER = ("full-history", "truncate", "summary", "rope")
+_ORDER = ("full-history", "truncate", "summary", "rope", "rope-unbound")
 
 
 def _ordered(metrics: dict[str, RegimeMetrics]) -> list[RegimeMetrics]:

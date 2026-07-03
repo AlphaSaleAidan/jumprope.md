@@ -21,7 +21,12 @@ Deterministic scripted-reader sweep, 3 seeds × 80 turns × 4 regimes:
 | full-history | 100% | 100% | 280,455 | 3.6 |
 | truncate | 91% | 67% | 201,517 | 4.5 |
 | summary | 79% | 24% | 192,357 | 4.1 |
-| **rope** | **94%** | **100%** | **145,933** | **6.4** |
+| **rope (bound)** | **95%** | **100%** | **148,607** | **6.4** |
+| rope-unbound | 100% | 100% | 498,828 | 2.0 |
+
+*(v1.1 update: rope regimes now use the system's own notation — densify
+lifted bound decision recall 79% → 83%; the unbound row measures perfect
+recall at honest cost, see B4/B5.)*
 
 **Findings to fix (the "major bugs" queue):**
 
@@ -33,6 +38,16 @@ Deterministic scripted-reader sweep, 3 seeds × 80 turns × 4 regimes:
   out of the rope but crowded in the store by fresher records. Same root
   cause as B1: retrieval recall, not rope structure.
 - **B3 — hash-embedder paraphrase blindness** (= jumping-rope A12).
+- **B4 — per-record structural overhead.** Every DECISIONS line carries a
+  full ISO date (~7 tokens) plus a reason field; on the unbound rope this
+  compounds into ~1.8× the raw oracle's cost on pre-distilled streams.
+  Candidates: MMDD dates, date elision when unchanged from previous line.
+- **B5 — the scenario under-sells unbound mode.** The bench feeds
+  pre-distilled events; real sessions are chatty transcripts where the
+  same facts arrive wrapped in 5–10× filler. A "chatty scenario" variant
+  (events embedded in conversational padding, streaming eviction in the
+  loop) would measure unbound mode's real economics (adapter tests: 17–18%
+  payloads).
 
 ## Phase 2 — information use (live model sweep) — NEXT, needs one decision
 
