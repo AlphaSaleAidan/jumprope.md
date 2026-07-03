@@ -60,7 +60,9 @@ def digest_tokens(topic: str) -> list[str]:
     return [words[0]]
 
 
-def build_keyring_digest(members: list[KeyItem]) -> str:
+def build_keyring_digest(
+    members: list[KeyItem], token_budget: int = DIGEST_TOKEN_BUDGET
+) -> str:
     """Digest topic for a keyring bundling ``members`` (oldest → newest)."""
     seen: set[str] = set()
     tokens: list[str] = []
@@ -73,7 +75,7 @@ def build_keyring_digest(members: list[KeyItem]) -> str:
     kept: list[str] = []
     for token in reversed(tokens):  # newest members win the budget
         candidate = [token, *kept]
-        if count_tokens(KEYRING_PREFIX + ",".join(candidate)) > DIGEST_TOKEN_BUDGET:
+        if count_tokens(KEYRING_PREFIX + ",".join(candidate)) > token_budget:
             break
         kept = candidate
     dropped = len(tokens) - len(kept)
@@ -110,6 +112,17 @@ class Compactor:
     ) -> None:
         self.budget_tokens = budget_tokens  # None = unbounded, never demote
         self.store = store
+        # Keyring digests live on the never-demotable floor: scale their
+        # budget to the rope budget so stubs cannot outgrow a small rope
+        # (adversarial finding A17).
+        self._digest_budget = (
+            DIGEST_TOKEN_BUDGET
+            if budget_tokens is None
+            else min(DIGEST_TOKEN_BUDGET, max(16, budget_tokens // 8))
+        )
+        # Every retained stub costs ~25-40 tokens of never-demotable floor
+        # (topic hint + key). Tight ropes keep none outside the keyring.
+        self._keep_newest = 2 if budget_tokens is None or budget_tokens >= 500 else 0
         # Notation profiles with a session dictionary (ai-native) code the
         # rope; demoted content is EXPANDED before storage so semantic and
         # lexical retrieval still match natural-language queries.
@@ -165,15 +178,16 @@ class Compactor:
         rope.add_key(topic=topic, turbovec_id=key)
         return Demotion(section=section, topic=topic, key=key, content=content)
 
-    def _coalesce_keys(self, rope: RopeFile, keep_newest: int = 2) -> bool:
+    def _coalesce_keys(self, rope: RopeFile, keep_newest: int | None = None) -> bool:
         """Bundle the oldest KEYS stubs into one TurboVec record.
 
         Returns False when there are too few stubs to make coalescing
-        worthwhile (< keep_newest + 2).
+        worthwhile (nothing would shrink).
         """
-        if len(rope.keys) < keep_newest + 2:
+        keep = self._keep_newest if keep_newest is None else keep_newest
+        if len(rope.keys) < max(keep + 2, 2):
             return False
-        old = rope.keys[:-keep_newest]
+        old = rope.keys[:-keep] if keep else list(rope.keys)
         content = self._expand("\n".join(k.render() for k in old))
         key = self.store.put(  # store BEFORE mutating the rope (A9)
             session_id=rope.session_id,
@@ -182,8 +196,10 @@ class Compactor:
             content=content,
             created_at=rope.timestamp,
         )
-        rope.keys = rope.keys[-keep_newest:]
-        rope.add_key(topic=build_keyring_digest(old), turbovec_id=key)
+        rope.keys = rope.keys[-keep:] if keep else []
+        rope.add_key(
+            topic=build_keyring_digest(old, self._digest_budget), turbovec_id=key
+        )
         return True
 
     def enforce(self, rope: RopeFile) -> list[Demotion]:
