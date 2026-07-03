@@ -9,6 +9,8 @@ from __future__ import annotations
 import re
 from typing import Protocol
 
+from .tokens import count_tokens
+
 GLYPH_DONE = "✓"  # ✓
 GLYPH_ACTIVE = "▶"  # ▶
 GLYPH_FAILED = "✗"  # ✗
@@ -233,6 +235,10 @@ class AiNativeProfile:
     MAX_TRACKED = 300
     NGRAM_SIZES = (4, 3)
     MIN_PHRASE_CHARS = 12  # shorter phrases are not worth a legend entry
+    # The legend is never demotable, so the dictionary must never grow the
+    # rope past a bound budget (adversarial finding A17). Sessions with a
+    # bound budget lower this to budget // 6.
+    dict_token_budget = 160
 
     def __init__(self) -> None:
         self._base = SymbolicEnProfile()
@@ -294,16 +300,26 @@ class AiNativeProfile:
             ),
             key=lambda t: (-t[0], -len(t[1]), t[1]),
         )
+        dict_line = " ".join(f"{c}={p}" for c, p in self.lexicon.items())
         for _count, phrase in candidates:
             if len(self.lexicon) >= self.MAX_LEXICON:
                 break
             bigrams = self._bigrams(phrase)
             if bigrams & taken:
                 continue
-            self.lexicon[_nth_code(len(self.lexicon))] = phrase
+            code = _nth_code(len(self.lexicon))
+            grown = f"{dict_line} {code}={phrase}".strip()
+            if count_tokens(grown) > self.dict_token_budget:  # A17
+                break
+            self.lexicon[code] = phrase
+            dict_line = grown
             taken |= bigrams
 
     def densify(self, text: str) -> str:
+        # A16: a literal '§' in input could later be mis-expanded as a
+        # dictionary code — neutralize it up front (same philosophy as the
+        # rope's pipe→slash sanitization).
+        text = text.replace("§", "⸿")
         out = self._base.densify(text)
         out = self._apply(out)
         self._mine(out)
@@ -313,7 +329,13 @@ class AiNativeProfile:
         for code, phrase in sorted(
             self.lexicon.items(), key=lambda kv: -len(kv[0])
         ):
-            text = text.replace(code, phrase)
+            # Boundary-safe (A16): '§ab' is not the code '§a'. The
+            # replacement is escaped so phrase backslashes stay literal.
+            text = re.sub(
+                re.escape(code) + r"(?![a-z])",
+                phrase.replace("\\", "\\\\"),
+                text,
+            )
         return text
 
     # -- persistence ------------------------------------------------------------

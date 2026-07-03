@@ -147,6 +147,11 @@ class JumpingRopeSession:
                 session_id=sid, timestamp=self._clock(), legend=self.profile.legend()
             )
         _validate_budget(self.meta.config)  # covers configs loaded from disk
+        budget = self.meta.config.rope_budget_tokens
+        if budget is not None and hasattr(self.profile, "dict_token_budget"):
+            # The dictionary lives in the never-demotable legend (A17): in
+            # bound mode it may claim at most a sixth of the rope budget.
+            self.profile.dict_token_budget = max(16, budget // 8)
         self.store = TurboVec(
             self.data_dir / DB_FILENAME,
             embedder=embedder,
