@@ -72,12 +72,17 @@ class Compactor:
         raise RopeBudgetError("no demotable item in OPEN")
 
     def demote_one(self, rope: RopeFile) -> Demotion | None:
-        """Demote the single oldest/lowest-priority item to TurboVec."""
+        """Demote the single oldest/lowest-priority item to TurboVec.
+
+        The store write happens BEFORE any rope mutation: if it raises
+        (disk full, I/O error) the rope is untouched and nothing is lost
+        (adversarial finding A9). Content-addressed keys make the retried
+        write idempotent.
+        """
         candidate = self._next_candidate(rope)
         if candidate is None:
             return None
-        section, _ = candidate
-        content = self._pop_candidate(rope, section)
+        section, content = candidate
         key = self.store.put(
             session_id=rope.session_id,
             jump_index=rope.jump_count,
@@ -85,6 +90,8 @@ class Compactor:
             content=content,
             created_at=rope.timestamp,
         )
+        popped = self._pop_candidate(rope, section)
+        assert popped == content, "peek/pop mismatch in demotion"
         topic = _topic_hint(content)
         rope.add_key(topic=topic, turbovec_id=key)
         return Demotion(section=section, topic=topic, key=key, content=content)
@@ -98,15 +105,15 @@ class Compactor:
         if len(rope.keys) < keep_newest + 2:
             return False
         old = rope.keys[:-keep_newest]
-        rope.keys = rope.keys[-keep_newest:]
         content = "\n".join(k.render() for k in old)
-        key = self.store.put(
+        key = self.store.put(  # store BEFORE mutating the rope (A9)
             session_id=rope.session_id,
             jump_index=rope.jump_count,
             section="KEYS",
             content=content,
             created_at=rope.timestamp,
         )
+        rope.keys = rope.keys[-keep_newest:]
         rope.add_key(topic=f"keyring:{len(old)} demoted keys", turbovec_id=key)
         return True
 
