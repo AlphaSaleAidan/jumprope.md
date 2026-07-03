@@ -92,3 +92,24 @@ Micro-decisions made where the spec left room, and why.
     more o200k tokens than abbreviated English. The profile ships as
     spec'd, behind a config flag, with measured numbers and a warning.
 19. **Python 3.11 as minimum**, CI matrix on 3.11 + 3.12.
+
+## v1.1 — bound/unbound modes (user feedback: "compaction stops the workflow")
+
+20. **Two first-class modes.** `rope_budget_tokens=0/None` = **unbound**: no
+    demotion pressure; the rope is the persistent record and grows as needed.
+    Eviction moves to the transcript side: `apply_streaming_policy` drops
+    each chat message from the outgoing history as soon as its content is
+    archived (coverage = content-addressed key exists in TurboVec). The
+    Python API default stays bound (2000) for compatibility; the chat
+    adapters default to unbound.
+21. **ai-native profile** = symbolic-en + adaptive per-session phrase
+    dictionary (`§a…`, declared in the legend, bigram-disjoint entries,
+    capped at 24). Coded on the rope only — the compactor expands codes
+    before TurboVec storage so retrieval matches natural language. State
+    persists in session.json.
+22. **Turn provenance.** `SessionMeta.total_turns` stamps archives and their
+    K-lines (`t{n}·topic`) and a `turn` column on TurboVec records (ALTER
+    TABLE migration for old DBs) — the key log lines up with the context log.
+23. **Streaming outbound can exceed a tiny naive history** by the rope's
+    fixed overhead (same effect as A13); the flat-growth property is what
+    matters and is what tests assert.

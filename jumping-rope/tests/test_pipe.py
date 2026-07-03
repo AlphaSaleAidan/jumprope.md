@@ -29,6 +29,7 @@ def load_pipe_module() -> Any:
 def pipe(tmp_path: Path) -> Any:
     module = load_pipe_module()
     p = module.Pipe()
+    p.valves.MODE = "bound"  # these tests exercise the episodic-jump mode
     p.valves.DATA_DIR = str(tmp_path / "pipe-data")
     p.valves.JUMP_EVERY_N_TURNS = 5
     p.valves.JUMP_THRESHOLD_TOKENS = 50_000

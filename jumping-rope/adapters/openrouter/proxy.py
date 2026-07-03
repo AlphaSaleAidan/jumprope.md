@@ -31,7 +31,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from jumping_rope import JumpConfig, JumpingRopeSession
-from jumping_rope.handoff import apply_jump_policy, record_turn
+from jumping_rope.handoff import apply_jump_policy, apply_streaming_policy, record_turn
 
 SESSION_HEADER = "X-JRope-Session"
 
@@ -51,6 +51,7 @@ def create_app(
     data_dir: str | Path | None = None,
     config: JumpConfig | None = None,
     client: httpx.AsyncClient | None = None,
+    mode: str | None = None,
 ) -> FastAPI:
     app = FastAPI(title="Jumping Rope Proxy", version="1.0.0")
     app.state.upstream_url = (
@@ -64,6 +65,21 @@ def create_app(
         data_dir or os.environ.get("JROPE_DATA_DIR", "./jrope-proxy-data")
     )
     app.state.config = config or _config_from_env()
+    # Mode resolution: explicit param > env > derived from an explicit
+    # config > default unbound. A caller who hands us a bounded config
+    # gets bound behavior without also having to say so.
+    if mode is not None:
+        app.state.mode = mode
+    elif "JROPE_MODE" in os.environ:
+        app.state.mode = os.environ["JROPE_MODE"]
+    elif config is not None:
+        app.state.mode = config.mode
+    else:
+        app.state.mode = "unbound"
+    if app.state.mode == "unbound" and config is None:
+        app.state.config = JumpConfig.unbound(
+            notation_profile=app.state.config.notation_profile
+        )
     app.state.client = client or httpx.AsyncClient(timeout=120.0)
     app.state.sessions = {}
 
@@ -92,8 +108,11 @@ def create_app(
         messages: list[dict[str, Any]] = list(body.get("messages", []))
         session = _session_for(request, messages)
 
-        record_turn(session, messages)
-        outbound, jumped = apply_jump_policy(session, messages)
+        if app.state.mode == "unbound":
+            outbound, jumped = apply_streaming_policy(session, messages)
+        else:
+            record_turn(session, messages)
+            outbound, jumped = apply_jump_policy(session, messages)
         payload = {**body, "messages": outbound}
 
         headers = {"Content-Type": "application/json"}

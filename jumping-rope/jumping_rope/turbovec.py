@@ -101,6 +101,7 @@ class VecRecord:
     content: str
     tokens: int
     created_at: str
+    turn: int = -1  # provenance: session turn that produced this record
 
 
 def _serialize(vec: list[float]) -> bytes:
@@ -149,10 +150,17 @@ class TurboVec:
                 content TEXT NOT NULL,
                 tokens INTEGER NOT NULL,
                 created_at TEXT NOT NULL,
-                embedding BLOB NOT NULL
+                embedding BLOB NOT NULL,
+                turn INTEGER NOT NULL DEFAULT -1
             )
             """
         )
+        try:  # migrate pre-provenance databases in place
+            self._conn.execute(
+                "ALTER TABLE records ADD COLUMN turn INTEGER NOT NULL DEFAULT -1"
+            )
+        except sqlite3.OperationalError:
+            pass  # column already exists
         self._conn.commit()
 
     def _try_load_extension(self) -> bool:
@@ -172,6 +180,14 @@ class TurboVec:
 
     # -- API ----------------------------------------------------------------
 
+    @staticmethod
+    def content_key(session_id: str, section: str, content: str) -> str:
+        """The deterministic key put() assigns to this exact content."""
+        digest = hashlib.sha1(
+            f"{session_id}\x1f{section}\x1f{content}".encode()
+        ).hexdigest()
+        return f"tv-{digest[:16]}"
+
     def put(
         self,
         *,
@@ -181,6 +197,7 @@ class TurboVec:
         content: str,
         key: str | None = None,
         created_at: str = "",
+        turn: int = -1,
     ) -> str:
         """Store content; returns the retrieval key.
 
@@ -189,17 +206,11 @@ class TurboVec:
         re-demotion can never duplicate records (adversarial findings A9/A10).
         """
         rec_id = uuid.uuid4().hex
-        if key is not None:
-            rec_key = key
-        else:
-            digest = hashlib.sha1(
-                f"{session_id}\x1f{section}\x1f{content}".encode()
-            ).hexdigest()
-            rec_key = f"tv-{digest[:16]}"
+        rec_key = key if key is not None else self.content_key(session_id, section, content)
         embedding = self.embedder.embed(content)
         with self._lock:
             self._conn.execute(
-                "INSERT OR IGNORE INTO records VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT OR IGNORE INTO records VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     rec_id,
                     session_id,
@@ -210,6 +221,7 @@ class TurboVec:
                     count_tokens(content),
                     created_at,
                     _serialize(embedding),
+                    turn,
                 ),
             )
             self._conn.commit()
@@ -219,7 +231,7 @@ class TurboVec:
         with self._lock:
             row = self._conn.execute(
                 "SELECT id, session_id, jump_index, section, key, content, tokens, "
-                "created_at FROM records WHERE key = ?",
+                "created_at, turn FROM records WHERE key = ?",
                 (key,),
             ).fetchone()
         if row is None:
@@ -246,13 +258,13 @@ class TurboVec:
             rows = self._conn.execute(
                 f"""
             SELECT id, session_id, jump_index, section, key, content, tokens,
-                   created_at, vec_distance_cosine(embedding, ?) AS d
+                   created_at, turn, vec_distance_cosine(embedding, ?) AS d
             FROM records {where}
             ORDER BY d ASC, key ASC LIMIT ?
             """,
             params,
         ).fetchall()
-        return [VecRecord(*row[:8]) for row in rows]
+        return [VecRecord(*row[:9]) for row in rows]
 
     def _search_fallback(
         self, qvec: list[float], k: int, session_id: str | None
@@ -262,11 +274,11 @@ class TurboVec:
         with self._lock:
             rows = self._conn.execute(
                 "SELECT id, session_id, jump_index, section, key, content, tokens, "
-                f"created_at, embedding FROM records {where}",
+                f"created_at, turn, embedding FROM records {where}",
                 params,
             ).fetchall()
         scored = [
-            (-_cosine(qvec, _deserialize(row[8])), row[4], VecRecord(*row[:8]))
+            (-_cosine(qvec, _deserialize(row[9])), row[4], VecRecord(*row[:9]))
             for row in rows
         ]
         scored.sort(key=lambda t: (t[0], t[1]))
@@ -279,7 +291,7 @@ class TurboVec:
         with self._lock:
             rows = self._conn.execute(
                 "SELECT id, session_id, jump_index, section, key, content, tokens, "
-                f"created_at FROM records {where} ORDER BY rowid",
+                f"created_at, turn FROM records {where} ORDER BY rowid",
                 params,
             ).fetchall()
         return [VecRecord(*row) for row in rows]

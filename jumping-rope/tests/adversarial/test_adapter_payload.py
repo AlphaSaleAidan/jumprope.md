@@ -39,6 +39,7 @@ def test_a13_pipe_giant_last_message(tmp_path: Path) -> None:
     assert GIANT_TOKENS >= 8_000, f"payload only {GIANT_TOKENS} tokens"
     module = _load("jumping_rope_pipe_a13", _ADAPTERS / "openwebui" / "jumping_rope_pipe.py")
     pipe = module.Pipe()
+    pipe.valves.MODE = "bound"
     pipe.valves.DATA_DIR = str(tmp_path / "pipe")
     pipe.valves.JUMP_EVERY_N_TURNS = 3
     pipe.valves.JUMP_THRESHOLD_TOKENS = 50_000

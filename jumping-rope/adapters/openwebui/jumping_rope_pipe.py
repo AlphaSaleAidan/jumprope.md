@@ -28,7 +28,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from jumping_rope import JumpConfig, JumpingRopeSession
-from jumping_rope.handoff import apply_jump_policy, record_turn
+from jumping_rope.handoff import apply_jump_policy, apply_streaming_policy, record_turn
 
 
 class Pipe:
@@ -40,6 +40,12 @@ class Pipe:
         UPSTREAM_KEY: str = Field(default="", description="Bearer token for the upstream")
         MODEL_ID: str = Field(
             default="deepseek/deepseek-chat", description="Model id sent upstream"
+        )
+        MODE: str = Field(
+            default="unbound",
+            description="'unbound': rope grows freely, transcript evicted "
+            "continuously once captured. 'bound': hard rope budget, "
+            "episodic jumps.",
         )
         JUMP_THRESHOLD_TOKENS: int = Field(
             default=12_000, description="Jump when naive history exceeds this"
@@ -78,8 +84,9 @@ class Pipe:
 
     def _session(self, convo_id: str) -> JumpingRopeSession:
         if convo_id not in self._sessions:
+            budget = 0 if self.valves.MODE == "unbound" else self.valves.ROPE_BUDGET_TOKENS
             config = JumpConfig(
-                rope_budget_tokens=self.valves.ROPE_BUDGET_TOKENS,
+                rope_budget_tokens=budget,
                 jump_threshold_tokens=self.valves.JUMP_THRESHOLD_TOKENS,
                 jump_every_n_turns=self.valves.JUMP_EVERY_N_TURNS,
                 notation_profile=self.valves.NOTATION_PROFILE,
@@ -119,8 +126,11 @@ class Pipe:
         messages: list[dict[str, Any]] = list(body.get("messages", []))
         session = self._session(self._conversation_id(body))
 
-        record_turn(session, messages)
-        outbound, jumped = apply_jump_policy(session, messages)
+        if self.valves.MODE == "unbound":
+            outbound, jumped = apply_streaming_policy(session, messages)
+        else:
+            record_turn(session, messages)
+            outbound, jumped = apply_jump_policy(session, messages)
 
         payload: dict[str, Any] = {
             "model": self.valves.MODEL_ID,

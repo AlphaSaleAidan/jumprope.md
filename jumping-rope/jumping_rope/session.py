@@ -38,13 +38,16 @@ def minimum_budget_tokens(profile_name: str) -> int:
 
 
 def _validate_budget(config: JumpConfig) -> None:
+    if config.rope_budget_tokens is None:  # unbounded mode: nothing to satisfy
+        return
     min_budget = minimum_budget_tokens(config.notation_profile)
     if config.rope_budget_tokens < min_budget:
         raise ValueError(
             f"rope_budget_tokens={config.rope_budget_tokens} is below the "
             f"satisfiable minimum {min_budget} for profile "
             f"{config.notation_profile!r} (fixed floor = legend + header + "
-            f"anchors, plus {MIN_BUDGET_HEADROOM} tokens headroom)"
+            f"anchors, plus {MIN_BUDGET_HEADROOM} tokens headroom); "
+            "use 0/None for an unbounded rope"
         )
 
 
@@ -54,10 +57,38 @@ def utc_now_iso() -> str:
 
 @dataclass
 class JumpConfig:
-    rope_budget_tokens: int = 2_000
+    rope_budget_tokens: int | None = 2_000  # 0/None = unbounded (no demotion)
     jump_threshold_tokens: int = 12_000
     jump_every_n_turns: int = 8
     notation_profile: str = "symbolic-en"
+
+    def __post_init__(self) -> None:
+        if not self.rope_budget_tokens:  # 0 → None
+            self.rope_budget_tokens = None
+
+    @property
+    def unbounded(self) -> bool:
+        return self.rope_budget_tokens is None
+
+    @property
+    def mode(self) -> str:
+        """The two operating modes:
+
+        - ``bound``   — hard rope budget, demotion to TurboVec, episodic
+          jumps. Minimal carried context; detail is a retrieval away.
+        - ``unbound`` — the rope grows as needed (it is still dense); the
+          TRANSCRIPT is what gets evicted, continuously, as soon as its
+          content is captured (see handoff.apply_streaming_policy).
+        """
+        return "unbound" if self.unbounded else "bound"
+
+    @classmethod
+    def bound(cls, rope_budget_tokens: int = 2_000, **kwargs: object) -> JumpConfig:
+        return cls(rope_budget_tokens=rope_budget_tokens, **kwargs)  # type: ignore[arg-type]
+
+    @classmethod
+    def unbound(cls, **kwargs: object) -> JumpConfig:
+        return cls(rope_budget_tokens=None, **kwargs)  # type: ignore[arg-type]
 
     @classmethod
     def from_dict(cls, data: dict[str, object]) -> JumpConfig:
@@ -70,6 +101,7 @@ class SessionMeta:
     session_id: str
     turns_since_jump: int = 0
     live_context_tokens: int = 0
+    total_turns: int = 0  # provenance clock: stamps K-lines and archives
     config: JumpConfig = field(default_factory=JumpConfig)
 
 
@@ -97,11 +129,15 @@ class JumpingRopeSession:
                 session_id=str(raw["session_id"]),
                 turns_since_jump=int(raw["turns_since_jump"]),
                 live_context_tokens=int(raw["live_context_tokens"]),
+                total_turns=int(raw.get("total_turns", 0)),
                 config=JumpConfig.from_dict(raw.get("config", {})),
             )
             if config is not None:
                 self.meta.config = config
             self.profile: NotationProfile = get_profile(self.meta.config.notation_profile)
+            state = raw.get("profile_state")
+            if isinstance(state, dict) and hasattr(self.profile, "load_state"):
+                self.profile.load_state(state)
             self.rope = RopeFile.parse(rope_path.read_text(encoding="utf-8"))
         else:
             sid = session_id if session_id is not None else uuid.uuid4().hex[:12]
@@ -116,7 +152,9 @@ class JumpingRopeSession:
             embedder=embedder,
             force_fallback=force_fallback,
         )
-        self.compactor = Compactor(self.meta.config.rope_budget_tokens, self.store)
+        self.compactor = Compactor(
+            self.meta.config.rope_budget_tokens, self.store, expand=self.profile.expand
+        )
         self.save()
 
     # -- events -----------------------------------------------------------------
@@ -162,6 +200,9 @@ class JumpingRopeSession:
         else:
             raise ValueError(f"unknown event section {section!r}")
         self.rope.timestamp = self._clock()
+        legend = self.profile.legend()
+        if legend != self.rope.legend:  # stateful profile grew its dictionary
+            self.rope.legend = legend
         self.compactor.enforce(self.rope)
         self.meta.live_context_tokens += raw_tokens
         self.save()
@@ -172,22 +213,38 @@ class JumpingRopeSession:
 
     def archive(self, topic: str, content: str) -> str:
         """Store full-fidelity content directly in TurboVec (tier 2) and pin a
-        retrieval key into ## KEYS. Used for material too bulky for the rope."""
+        retrieval key into ## KEYS. Used for material too bulky for the rope.
+
+        The K-line topic is stamped t{turn} so the key log lines up with the
+        context log: transcript turn N ↔ K-line "K{n}|tN·topic|key"."""
+        turn = self.meta.total_turns
         rec_key = self.store.put(
             session_id=self.meta.session_id,
             jump_index=self.rope.jump_count,
             section="ARCHIVE",
             content=content,
             created_at=self._clock(),
+            turn=turn,
         )
-        self.rope.add_key(topic=self.profile.densify(topic), turbovec_id=rec_key)
+        topic_d = self.profile.densify(topic)
+        self.rope.add_key(topic=f"t{turn}·{topic_d}", turbovec_id=rec_key)
+        legend = self.profile.legend()
+        if legend != self.rope.legend:
+            self.rope.legend = legend
         self.compactor.enforce(self.rope)
         self.save()
         return rec_key
 
+    def is_covered(self, content: str) -> bool:
+        """True when this exact content is already archived (tier 2) —
+        the transcript copy is redundant and can be evicted."""
+        key = self.store.content_key(self.meta.session_id, "ARCHIVE", content)
+        return self.store.get(key) is not None
+
     def note_turn(self, *texts: str) -> None:
         """Account one conversational turn toward the jump cadence."""
         self.meta.turns_since_jump += 1
+        self.meta.total_turns += 1
         self.meta.live_context_tokens += sum(count_tokens(t) for t in texts)
         self.save()
 
@@ -230,12 +287,15 @@ class JumpingRopeSession:
 
     def save(self) -> None:
         self.rope_path.write_text(self.rope.render(), encoding="utf-8")
-        meta = {
+        meta: dict[str, object] = {
             "session_id": self.meta.session_id,
             "turns_since_jump": self.meta.turns_since_jump,
             "live_context_tokens": self.meta.live_context_tokens,
+            "total_turns": self.meta.total_turns,
             "config": asdict(self.meta.config),
         }
+        if hasattr(self.profile, "state_dict"):
+            meta["profile_state"] = self.profile.state_dict()
         (self.data_dir / META_FILENAME).write_text(
             json.dumps(meta, indent=2), encoding="utf-8"
         )
@@ -243,6 +303,7 @@ class JumpingRopeSession:
     def status(self) -> dict[str, object]:
         return {
             "session_id": self.meta.session_id,
+            "mode": self.meta.config.mode,
             "jump_count": self.rope.jump_count,
             "rope_tokens": count_tokens(self.rope.render()),
             "rope_budget_tokens": self.meta.config.rope_budget_tokens,

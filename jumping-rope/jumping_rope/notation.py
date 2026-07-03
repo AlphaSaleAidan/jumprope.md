@@ -30,11 +30,18 @@ class NotationProfile(Protocol):
     def name(self) -> str: ...
 
     def legend(self) -> str:
-        """One-time notation legend (≤120 tokens), emitted once per rope."""
+        """Notation legend, emitted once per rope (stateful profiles may
+        extend it as their dictionary grows — it is never repeated)."""
         ...
 
     def densify(self, text: str) -> str:
         """Compress prose into profile notation. Deterministic."""
+        ...
+
+    def expand(self, text: str) -> str:
+        """Reverse any dictionary coding (identity for stateless profiles).
+        Applied before content reaches TurboVec so retrieval matches
+        natural-language queries."""
         ...
 
 
@@ -156,6 +163,9 @@ class SymbolicEnProfile:
     def densify(self, text: str) -> str:
         return _telegraphic(text)
 
+    def expand(self, text: str) -> str:
+        return text
+
 
 # cjk-dense maps frequent operational words onto single CJK characters on top
 # of the symbolic-en pipeline. Token savings vary by tokenizer — README
@@ -194,22 +204,150 @@ class CjkDenseProfile:
             out = pattern.sub(rep, out)
         return out
 
+    def expand(self, text: str) -> str:
+        return text
 
-_PROFILES: dict[str, NotationProfile] = {
-    "symbolic-en": SymbolicEnProfile(),
-    "cjk-dense": CjkDenseProfile(),
+
+# -- ai-native: adaptive dictionary coding ------------------------------------
+# The rope is written FOR a model, not a human. On top of symbolic-en, this
+# profile mines the session's own recurring phrases and assigns them short
+# codes (§a, §b, …) declared once in the legend — LZ-style compression whose
+# dictionary the reader model can see. Content is expanded back to natural
+# language before it reaches TurboVec, so retrieval is unaffected.
+
+_CODE_ALPHABET = "abcdefghijklmnopqrstuvwxyz"
+_CODE_RE = re.compile(r"§[a-z]{1,2}")
+
+
+def _nth_code(n: int) -> str:
+    if n < 26:
+        return f"§{_CODE_ALPHABET[n]}"
+    return f"§{_CODE_ALPHABET[n // 26 - 1]}{_CODE_ALPHABET[n % 26]}"
+
+
+class AiNativeProfile:
+    """Stateful symbolic-en + per-session adaptive phrase dictionary."""
+
+    PROMOTE_AT = 3  # occurrences before a phrase earns a code
+    MAX_LEXICON = 24
+    MAX_TRACKED = 300
+    NGRAM_SIZES = (4, 3)
+    MIN_PHRASE_CHARS = 12  # shorter phrases are not worth a legend entry
+
+    def __init__(self) -> None:
+        self._base = SymbolicEnProfile()
+        self.lexicon: dict[str, str] = {}  # code -> phrase
+        self._counts: dict[str, int] = {}
+
+    @property
+    def name(self) -> str:
+        return "ai-native"
+
+    def legend(self) -> str:
+        base = self._base.legend()
+        if not self.lexicon:
+            return base
+        entries = " ".join(f"{code}={phrase}" for code, phrase in self.lexicon.items())
+        return base + "\ndict: " + entries
+
+    # -- coding ---------------------------------------------------------------
+
+    def _apply(self, text: str) -> str:
+        for code, phrase in sorted(
+            self.lexicon.items(), key=lambda kv: -len(kv[1])
+        ):
+            text = re.sub(rf"(?<!\w){re.escape(phrase)}(?!\w)", code, text)
+        return text
+
+    def _mine(self, text: str) -> None:
+        words = [w for w in text.split() if "§" not in w and "|" not in w]
+        for size in self.NGRAM_SIZES:
+            for i in range(len(words) - size + 1):
+                phrase = " ".join(words[i : i + size])
+                if len(phrase) < self.MIN_PHRASE_CHARS:
+                    continue
+                self._counts[phrase] = self._counts.get(phrase, 0) + 1
+        self._promote()
+        if len(self._counts) > self.MAX_TRACKED:  # bounded state
+            keep = sorted(self._counts.items(), key=lambda kv: -kv[1])
+            self._counts = dict(keep[: self.MAX_TRACKED])
+
+    @staticmethod
+    def _bigrams(phrase: str) -> set[tuple[str, str]]:
+        words = phrase.split()
+        return set(zip(words, words[1:], strict=False))
+
+    def _promote(self) -> None:
+        if len(self.lexicon) >= self.MAX_LEXICON:
+            return
+        taken: set[tuple[str, str]] = set()
+        for existing in self.lexicon.values():
+            taken |= self._bigrams(existing)
+        # Longest, most frequent candidates first; one entry per phrase
+        # region (candidates sharing a word-bigram with an existing entry
+        # are redundant — the longer entry already covers them).
+        candidates = sorted(
+            (
+                (count, phrase)
+                for phrase, count in self._counts.items()
+                if count >= self.PROMOTE_AT and phrase not in self.lexicon.values()
+            ),
+            key=lambda t: (-t[0], -len(t[1]), t[1]),
+        )
+        for _count, phrase in candidates:
+            if len(self.lexicon) >= self.MAX_LEXICON:
+                break
+            bigrams = self._bigrams(phrase)
+            if bigrams & taken:
+                continue
+            self.lexicon[_nth_code(len(self.lexicon))] = phrase
+            taken |= bigrams
+
+    def densify(self, text: str) -> str:
+        out = self._base.densify(text)
+        out = self._apply(out)
+        self._mine(out)
+        return out
+
+    def expand(self, text: str) -> str:
+        for code, phrase in sorted(
+            self.lexicon.items(), key=lambda kv: -len(kv[0])
+        ):
+            text = text.replace(code, phrase)
+        return text
+
+    # -- persistence ------------------------------------------------------------
+
+    def state_dict(self) -> dict[str, object]:
+        return {"lexicon": self.lexicon, "counts": self._counts}
+
+    def load_state(self, state: dict[str, object]) -> None:
+        lexicon = state.get("lexicon", {})
+        counts = state.get("counts", {})
+        if isinstance(lexicon, dict):
+            self.lexicon = {str(k): str(v) for k, v in lexicon.items()}
+        if isinstance(counts, dict):
+            self._counts = {str(k): int(str(v)) for k, v in counts.items()}
+
+
+_PROFILE_FACTORIES: dict[str, type] = {
+    "symbolic-en": SymbolicEnProfile,
+    "cjk-dense": CjkDenseProfile,
+    "ai-native": AiNativeProfile,
 }
 
 
 def get_profile(name: str) -> NotationProfile:
-    """Look up a registered profile by name."""
+    """Build a fresh profile instance by name (stateful profiles hold a
+    per-session dictionary, so instances are never shared)."""
     try:
-        return _PROFILES[name]
+        profile: NotationProfile = _PROFILE_FACTORIES[name]()
+        return profile
     except KeyError:
-        known = ", ".join(sorted(_PROFILES))
+        known = ", ".join(sorted(_PROFILE_FACTORIES))
         raise KeyError(f"unknown notation profile {name!r}; known: {known}") from None
 
 
-def register_profile(profile: NotationProfile) -> None:
-    """Register a custom profile (overwrites an existing name)."""
-    _PROFILES[profile.name] = profile
+def register_profile(profile_cls: type) -> None:
+    """Register a custom profile class (overwrites an existing name)."""
+    _PROFILE_FACTORIES[profile_cls().name] = profile_cls

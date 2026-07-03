@@ -8,6 +8,7 @@ missing detail is fetched back from TurboVec like a cache miss.
 
 from .compactor import Compactor, RopeBudgetError
 from .notation import (
+    AiNativeProfile,
     CjkDenseProfile,
     NotationProfile,
     SymbolicEnProfile,
@@ -29,6 +30,7 @@ from .turbovec import (
 __version__ = "1.0.0"
 
 __all__ = [
+    "AiNativeProfile",
     "CjkDenseProfile",
     "Compactor",
     "Embedder",

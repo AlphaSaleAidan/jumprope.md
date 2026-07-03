@@ -39,6 +39,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_init = sub.add_parser("init", help="initialize a session")
     _add_data_dir(p_init)
     p_init.add_argument("--session-id", default=None)
+    p_init.add_argument(
+        "--mode", default="bound", choices=["bound", "unbound"],
+        help="bound: hard rope budget + jumps; unbound: rope grows freely, "
+        "transcript evicted continuously",
+    )
     p_init.add_argument("--rope-budget-tokens", type=int, default=2_000)
     p_init.add_argument("--jump-threshold-tokens", type=int, default=12_000)
     p_init.add_argument("--jump-every-n-turns", type=int, default=8)
@@ -83,7 +88,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "init":
         config = JumpConfig(
-            rope_budget_tokens=args.rope_budget_tokens,
+            rope_budget_tokens=0 if args.mode == "unbound" else args.rope_budget_tokens,
             jump_threshold_tokens=args.jump_threshold_tokens,
             jump_every_n_turns=args.jump_every_n_turns,
             notation_profile=args.profile,

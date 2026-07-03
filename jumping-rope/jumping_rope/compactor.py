@@ -15,6 +15,7 @@ Policy (deterministic):
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
 
 from .rope import KeyItem, RopeFile
@@ -101,9 +102,18 @@ def _topic_hint(text: str) -> str:
 
 
 class Compactor:
-    def __init__(self, budget_tokens: int, store: TurboVec) -> None:
-        self.budget_tokens = budget_tokens
+    def __init__(
+        self,
+        budget_tokens: int | None,
+        store: TurboVec,
+        expand: Callable[[str], str] | None = None,
+    ) -> None:
+        self.budget_tokens = budget_tokens  # None = unbounded, never demote
         self.store = store
+        # Notation profiles with a session dictionary (ai-native) code the
+        # rope; demoted content is EXPANDED before storage so semantic and
+        # lexical retrieval still match natural-language queries.
+        self._expand = expand if expand is not None else (lambda text: text)
 
     # -- demotion -------------------------------------------------------------
 
@@ -146,7 +156,7 @@ class Compactor:
             session_id=rope.session_id,
             jump_index=rope.jump_count,
             section=section,
-            content=content,
+            content=self._expand(content),
             created_at=rope.timestamp,
         )
         popped = self._pop_candidate(rope, section)
@@ -164,7 +174,7 @@ class Compactor:
         if len(rope.keys) < keep_newest + 2:
             return False
         old = rope.keys[:-keep_newest]
-        content = "\n".join(k.render() for k in old)
+        content = self._expand("\n".join(k.render() for k in old))
         key = self.store.put(  # store BEFORE mutating the rope (A9)
             session_id=rope.session_id,
             jump_index=rope.jump_count,
@@ -177,7 +187,13 @@ class Compactor:
         return True
 
     def enforce(self, rope: RopeFile) -> list[Demotion]:
-        """Demote until the rendered rope fits the budget. Returns demotions."""
+        """Demote until the rendered rope fits the budget. Returns demotions.
+
+        Unbounded mode (budget None): no demotion pressure — the rope is the
+        persistent record and grows as needed; eviction happens on the
+        transcript side instead (see handoff.apply_streaming_policy)."""
+        if self.budget_tokens is None:
+            return []
         demotions: list[Demotion] = []
         while count_tokens(rope.render()) > self.budget_tokens:
             demotion = self.demote_one(rope)
