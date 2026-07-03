@@ -14,6 +14,11 @@ Micro-decisions made where the spec left room, and why.
    single TurboVec "keyring" record and replaced by one stub. Retrieval
    becomes two-hop but nothing is ever lost. Without this, KEYS grows without
    bound and small budgets eventually become unsatisfiable.
+   *(Amended after adversarial finding A1a:)* the keyring stub's topic is a
+   digest `KR:tok1,tok2,… [+n]` carrying one significant token per
+   transitive member (48-token budget, newest first) — a bare
+   `keyring:N demoted keys` label left bundled members unreachable to a
+   literal cold reader.
 3. **Demotion order across sections** is DECISIONS → DELTA → OPEN (P3 before
    P2), oldest-first within each. The spec fixes oldest-first per section and
    the P2/P3-only rule for OPEN; the cross-section order is our deterministic

@@ -51,6 +51,16 @@ never demoted; `DECISIONS`/`DELTA` demote oldest-first and `OPEN` demotes
 only P2/P3 items, each leaving a one-line stub in `## KEYS` with a TurboVec
 retrieval key.
 
+When `## KEYS` itself grows past what the budget allows, the oldest stubs
+coalesce into a **keyring**: one TurboVec record bundling the stubs, replaced
+in the rope by a single digest stub `K{n}|KR:tok1,tok2,… [+n]|{key}` carrying
+one significant token per transitive member (newest members win a 48-token
+digest budget; `+n` marks overflow). A cold reader — human or model — matches
+its question against the digest, retrieves the keyring, and recurses into the
+member stubs it lists. Adversarially verified: a literal-minded cold agent
+recovers 20/20 planted facts through a hostile-compaction rope with keyring
+generations 4 deep (see `ADVERSARIAL_REPORT.md`, finding A1).
+
 ## Quickstart 1 — Python library
 
 ```bash
@@ -149,10 +159,37 @@ history grows while the rope stays flat.
 | `jump_every_n_turns` | 8 | jump at least this often |
 | `notation_profile` | `symbolic-en` | or `cjk-dense` |
 
+**Minimum budget.** A budget below the satisfiable minimum is rejected at
+construction with a `ValueError` naming the computed minimum:
+`minimum_budget_tokens(profile) = fixed floor (legend + header + anchors) +
+64 tokens headroom` — **219 tokens** for `symbolic-en` under o200k_base
+(measured floor: 155, regression-pinned in the adversarial suite).
+
 Embedders: `HashEmbedder` (default; deterministic, dependency-free) or
 `SentenceTransformerEmbedder` (`pip install "jumping-rope[st]"`). The
 sqlite-vec extension (`[vec]` extra) accelerates search when present; a
 pure-SQLite brute-force fallback keeps everything working without it.
+
+## Limitations (measured, adversarial suite)
+
+- **Hash embeddings miss paraphrases under near-duplicate load.** With 200
+  distractors differing from a true record by one token (port numbers,
+  negation), top-3 semantic search finds the record for verbatim and
+  near-verbatim queries but **not** for a paraphrase ("which port does the
+  sentinel service keep open…") — 67% hit rate across the three query styles
+  (finding A12). One-token differences are near-invisible to bag-of-ngram
+  hashing. Exact-key retrieval is immune (keys are content-addressed). If
+  you need paraphrase-robust recall, install the `[st]` extra and use
+  `SentenceTransformerEmbedder`.
+- **Keyring depth vs. literal readers.** Facts buried deeper than ~3 keyring
+  generations are beyond a literal reader's stub-following recursion; they
+  remain retrievable via semantic search and exact keys (finding A1,
+  recovery-path table in `ADVERSARIAL_REPORT.md`).
+- **Crash semantics are at-least-once.** A crash between a TurboVec write
+  and the rope save can leave a fact both in the rope and in the store;
+  content-addressed keys guarantee the duplicate collapses on the next
+  demotion (findings A9/A10). Nothing is ever lost, but readers may briefly
+  see a fact twice.
 
 ## Development
 
