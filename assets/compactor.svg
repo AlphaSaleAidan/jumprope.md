@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 500" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
+<rect width="960" height="500" rx="18" fill="#0B1220"/>
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#5B708F"/></marker>
+                <marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#3B82F6"/></marker></defs>
+<text x="480" y="44" fill="#E7EEF9" font-size="19" font-weight="700" text-anchor="middle">Inside the rope: what happens when it fills up (BOUND mode)</text>
+<text x="480" y="66" fill="#93A4C3" font-size="13.5" font-weight="600" text-anchor="middle">hard cap 2,000 tokens · eviction is a policy, not a panic</text>
+<rect x="45" y="95" width="540" height="360" rx="14" fill="none" stroke="#3B82F6" stroke-width="2"/>
+<text x="65" y="122" fill="#3B82F6" font-size="14" font-weight="700" letter-spacing="1">THE ROPE — 2,000-TOKEN CAP</text>
+<rect x="70" y="140" width="490" height="84" rx="12" fill="#111C33" stroke="#2A3B5F"/>
+<rect x="70" y="140" width="5" height="84" rx="2.5" fill="#34D399"/>
+<circle cx="96" cy="167" r="5" fill="#34D399"/>
+<text x="110" y="172" fill="#E7EEF9" font-size="14" font-weight="700" letter-spacing="1">PROTECTED — never leaves</text>
+<text x="96" y="198" fill="#93A4C3" font-size="13.5">current state · goals · the notation legend</text>
+<rect x="70" y="238" width="490" height="84" rx="12" fill="#111C33" stroke="#2A3B5F"/>
+<rect x="70" y="238" width="5" height="84" rx="2.5" fill="#F59E0B"/>
+<circle cx="96" cy="265" r="5" fill="#F59E0B"/>
+<text x="110" y="270" fill="#E7EEF9" font-size="14" font-weight="700" letter-spacing="1">EVICTABLE — oldest goes first</text>
+<text x="96" y="296" fill="#93A4C3" font-size="13.5">decisions · file changes · low-priority open items</text>
+<rect x="70" y="336" width="490" height="96" rx="12" fill="#111C33" stroke="#2A3B5F"/>
+<rect x="70" y="336" width="5" height="96" rx="2.5" fill="#A78BFA"/>
+<circle cx="96" cy="363" r="5" fill="#A78BFA"/>
+<text x="110" y="368" fill="#E7EEF9" font-size="14" font-weight="700" letter-spacing="1">VAULT INDEX — one line per stored item</text>
+<text x="96" y="394" fill="#93A4C3" font-size="13.5">topic hint + lookup key, stamped with its turn:</text>
+<text x="96" y="413" fill="#93A4C3" font-size="13.5">K7 | t34·user: original perf reqs | tv-8a0b8122</text>
+<rect x="700" y="240" width="220" height="130" rx="12" fill="#111C33" stroke="#2A3B5F"/>
+<rect x="700" y="240" width="5" height="130" rx="2.5" fill="#A78BFA"/>
+<circle cx="726" cy="267" r="5" fill="#A78BFA"/>
+<text x="740" y="272" fill="#E7EEF9" font-size="16" font-weight="700" letter-spacing="1">THE VAULT</text>
+<text x="726" y="298" fill="#93A4C3" font-size="13.5">full text, never</text>
+<text x="726" y="317" fill="#93A4C3" font-size="13.5">summarized, searchable</text>
+<line x1="560" y1="275" x2="696" y2="290" stroke="#5B708F" stroke-width="2" marker-end="url(#arr)"/>
+<text x="630" y="240" fill="#93A4C3" font-size="12.5" font-weight="600" text-anchor="middle">over the cap? oldest row</text>
+<text x="630" y="256" fill="#93A4C3" font-size="12.5" font-weight="600" text-anchor="middle">moves out — in full</text>
+<line x1="700" y1="340" x2="564" y2="375" stroke="#5B708F" stroke-width="2" marker-end="url(#arr)"/>
+<text x="645" y="408" fill="#93A4C3" font-size="12.5" font-weight="600" text-anchor="middle">leaves a one-line</text>
+<text x="645" y="424" fill="#93A4C3" font-size="12.5" font-weight="600" text-anchor="middle">index entry behind</text>
+<text x="480" y="480" fill="#93A4C3" font-size="12.5" font-weight="600" text-anchor="middle">If even the index grows long, its oldest rows bundle into one summary row that keeps a keyword per item.</text>
+</svg>

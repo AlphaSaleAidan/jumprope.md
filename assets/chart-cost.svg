@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 452" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
+<rect width="900" height="452" rx="18" fill="#0B1220"/>
+<text x="70" y="44" fill="#E7EEF9" font-size="22" font-weight="700">Cost of the identical session</text>
+<text x="70" y="70" fill="#93A4C3" font-size="14">Total tokens paid across all turns · thousands · lower is better</text>
+<defs><linearGradient id="hero" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#60A5FA"/><stop offset="1" stop-color="#3B82F6"/></linearGradient></defs>
+<line x1="70" y1="388.0" x2="830" y2="388.0" stroke="#22314F" stroke-width="1" stroke-dasharray="none"/>
+<text x="60" y="392.0" fill="#93A4C3" font-size="12" text-anchor="end">0</text>
+<line x1="70" y1="321.5" x2="830" y2="321.5" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
+<text x="60" y="325.5" fill="#93A4C3" font-size="12" text-anchor="end">75</text>
+<line x1="70" y1="255.0" x2="830" y2="255.0" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
+<text x="60" y="259.0" fill="#93A4C3" font-size="12" text-anchor="end">150</text>
+<line x1="70" y1="188.5" x2="830" y2="188.5" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
+<text x="60" y="192.5" fill="#93A4C3" font-size="12" text-anchor="end">225</text>
+<line x1="70" y1="122.0" x2="830" y2="122.0" stroke="#22314F" stroke-width="1" stroke-dasharray="3 5"/>
+<text x="60" y="126.0" fill="#93A4C3" font-size="12" text-anchor="end">300</text>
+<path d="M70.0,388.0 v-238.3 q0,-10 10,-10 h90 q10,0 10,10 v238.3 z" fill="#3D4F73"/>
+<text x="125.0" y="127.7" fill="#E7EEF9" font-size="19" font-weight="700" text-anchor="middle">280k</text>
+<text x="125.0" y="412.0" fill="#93A4C3" font-size="14" text-anchor="middle">carry</text>
+<text x="125.0" y="429.0" fill="#93A4C3" font-size="14" text-anchor="middle">everything</text>
+<path d="M286.7,388.0 v-169.1 q0,-10 10,-10 h90 q10,0 10,10 v169.1 z" fill="#3D4F73"/>
+<text x="341.7" y="196.9" fill="#E7EEF9" font-size="19" font-weight="700" text-anchor="middle">202k</text>
+<text x="341.7" y="412.0" fill="#93A4C3" font-size="14" text-anchor="middle">cut</text>
+<text x="341.7" y="429.0" fill="#93A4C3" font-size="14" text-anchor="middle">oldest</text>
+<path d="M503.3,388.0 v-160.2 q0,-10 10,-10 h90 q10,0 10,10 v160.2 z" fill="#3D4F73"/>
+<text x="558.3" y="205.8" fill="#E7EEF9" font-size="19" font-weight="700" text-anchor="middle">192k</text>
+<text x="558.3" y="412.0" fill="#93A4C3" font-size="14" text-anchor="middle">auto-</text>
+<text x="558.3" y="429.0" fill="#93A4C3" font-size="14" text-anchor="middle">summarize</text>
+<path d="M720.0,388.0 v-119.5 q0,-10 10,-10 h90 q10,0 10,10 v119.5 z" fill="url(#hero)"/>
+<text x="775.0" y="246.5" fill="#60A5FA" font-size="19" font-weight="700" text-anchor="middle">146k</text>
+<text x="775.0" y="412.0" fill="#60A5FA" font-size="14" font-weight="700" text-anchor="middle">ROPE</text>
+</svg>
