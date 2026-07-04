@@ -97,7 +97,7 @@ efficiency lead intact.
 - Replay real agent transcripts (Claude Code sessions via the
   jumping-rope skill) through the regimes; score with planted questions
   authored per-transcript.
-- Merge both jumping-rope PRs, re-pin this repo's dependency from the
+- ~~Merge both jumping-rope PRs, re-pin this repo’s dependency from the
   `test/adversarial-v1` branch to `main`, cut jumping-rope v1.1 with README
   claims backed by RopeBench numbers, and publish both packages.
 

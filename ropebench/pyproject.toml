@@ -10,7 +10,7 @@ readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.11"
 dependencies = [
-    "jumping-rope @ git+https://github.com/AlphaSaleAidan/jumping-rope.git@feat/v1.1-streaming-unbounded",
+    "jumping-rope @ git+https://github.com/AlphaSaleAidan/jumping-rope.git@main",
 ]
 
 [project.optional-dependencies]

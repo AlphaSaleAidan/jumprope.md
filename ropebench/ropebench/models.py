@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import urllib.request
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -115,6 +116,64 @@ SYSTEM_PROMPT = (
 )
 
 ChatFn = Callable[[list[dict[str, str]]], str]
+
+
+class CommandModel:
+    """Live-mode adapter that shells out to a CLI model (e.g. `claude -p
+    --model haiku`). The prompt goes to stdin, the reply is stdout. The
+    RETRIEVE: protocol works via re-invocation with the retrieval result
+    appended. A failed or timed-out invocation scores as a miss instead of
+    crashing the sweep."""
+
+    name = "command"
+
+    def __init__(
+        self,
+        argv: list[str],
+        max_retrieval_rounds: int = 2,
+        timeout_s: int = 120,
+    ) -> None:
+        self.argv = argv
+        self.max_retrieval_rounds = max_retrieval_rounds
+        self.timeout_s = timeout_s
+
+    def _chat(self, prompt: str) -> str:
+        try:
+            proc = subprocess.run(
+                self.argv, input=prompt, capture_output=True, text=True,
+                timeout=self.timeout_s, check=False,
+            )
+        except subprocess.TimeoutExpired:
+            return ""
+        return proc.stdout.strip()
+
+    def answer(
+        self, context: str, question: str, retrieve: RetrieveFn | None = None
+    ) -> ModelAnswer:
+        retrieval_note = (
+            "" if retrieve is None else "\n(retrieval available via RETRIEVE:)"
+        )
+        prompt = (
+            f"{SYSTEM_PROMPT}\n\nCONTEXT:\n{context}\n\n"
+            f"QUESTION: {question}{retrieval_note}"
+        )
+        extra = 0
+        used_retrieval = False
+        for _ in range(self.max_retrieval_rounds + 1):
+            reply = self._chat(prompt)
+            match = re.match(r"^RETRIEVE:\s*(.+)$", reply, re.IGNORECASE)
+            if match is None or retrieve is None:
+                return ModelAnswer(
+                    text=reply, extra_tokens=extra, used_retrieval=used_retrieval
+                )
+            retrieved = retrieve(match.group(1).strip())
+            used_retrieval = True
+            extra += count_tokens(retrieved)
+            prompt = (
+                f"{prompt}\n\nRETRIEVAL RESULT:\n{retrieved}\n\n"
+                f"QUESTION: {question}"
+            )
+        return ModelAnswer(text=reply, extra_tokens=extra, used_retrieval=used_retrieval)
 
 
 class OpenAICompatModel:
