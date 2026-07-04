@@ -127,15 +127,22 @@ class CommandModel:
 
     name = "command"
 
+    # A regime whose context alone exceeds this is not sendable to the model
+    # at all — a real, first-class outcome on long sessions (the full
+    # transcript literally does not fit), not a silent miss.
+    CONTEXT_EXCEEDED = "[context-exceeded]"
+
     def __init__(
         self,
         argv: list[str],
         max_retrieval_rounds: int = 2,
         timeout_s: int = 120,
+        max_context_tokens: int = 190_000,
     ) -> None:
         self.argv = argv
         self.max_retrieval_rounds = max_retrieval_rounds
         self.timeout_s = timeout_s
+        self.max_context_tokens = max_context_tokens
 
     def _chat(self, prompt: str) -> str:
         try:
@@ -153,6 +160,8 @@ class CommandModel:
         retrieval_note = (
             "" if retrieve is None else "\n(retrieval available via RETRIEVE:)"
         )
+        if count_tokens(context) > self.max_context_tokens:
+            return ModelAnswer(text=self.CONTEXT_EXCEEDED)  # does not fit; scored a miss
         prompt = (
             f"{SYSTEM_PROMPT}\n\nCONTEXT:\n{context}\n\n"
             f"QUESTION: {question}{retrieval_note}"

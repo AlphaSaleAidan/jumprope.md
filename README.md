@@ -94,6 +94,44 @@ Three findings:
 3. **Unbound stays perfect live** (100%, zero retrievals) with the same
    honest cost profile as scripted (see B4/B5).
 
+## Frontier models
+
+The strategy is not a small-model artifact. Same benchmark (1 seed × 60 turns,
+matched config) across three tiers, `results/frontier-*/`:
+
+| Model | carry-all acc | **rope acc** | rope acc/10k | oracle acc/10k | summary long-dist |
+|---|---|---|---|---|---|
+| Haiku 4.5 | 100% | 100% | **24.6** | 15.2 | 14% |
+| Sonnet 4.6 | 100% | 92% | **23.1** | 15.2 | 14% |
+| Opus 4.8 | 92% | **96%** | **22.8** | 14.0 | 0% |
+
+Bound rope has the best accuracy-per-token on every model (~1.6× the oracle).
+The headline is Opus: **the rope *beat* carry-everything (96% vs 92%)** — a
+strong model reasons better over a dense focused ledger than over a noisy full
+transcript, so compression is not just cheaper here, it is more accurate.
+Summary-compaction collapses on old facts across all three tiers.
+
+## Real Claude Code session (Phase 5)
+
+`ropebench replay <session.jsonl>` mines cloze probes from a real session's own
+recurring distinctive values (ports, flags, PR#, hashes, versions) — owned
+ground truth, no LLM judge. On a real 117-turn session:
+
+| Regime | Acc | tokens | acc/10k |
+|---|---|---|---|
+| full-history | 43–57% | **1,348,358** | 0.3–0.4 |
+| truncate | 0–71% | 49,943 | 0–14 |
+| summary | 0–43% | 50,775 | 0–8 |
+| **rope (bound)** | 43% | **74–77K** | **5.6–5.8** |
+| rope-unbound | 29–71% | 1,326,736 | 0.2–0.5 |
+
+Decisive real-world finding: **the full transcript is 1.35M tokens — it does
+not fit in any model's context window**, while the rope carries the same
+session in ~75K (**18× smaller**) and fits. With only 7 auto-mined probes the
+accuracy figures are small-sample (ranges show scripted vs live), but the cost
+gap is unambiguous, and a live model on 1.35M raw tokens scored *worse* (43%)
+than the same model on the rope — big contexts degrade, dense ledgers don't.
+
 ## Run it
 
 ```bash

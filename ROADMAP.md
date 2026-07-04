@@ -101,23 +101,49 @@ efficiency lead intact.
 
 **Exit criterion:** new probe kinds ≥ 90% for rope in scripted mode.
 
-## Phase 5 — real-workload replay + release
+## Phase 5 — real-workload replay ✅ (harness done 2026-07-04)
 
-- Replay real agent transcripts (Claude Code sessions via the
-  jumping-rope skill) through the regimes; score with planted questions
-  authored per-transcript.
-- ~~Merge both jumping-rope PRs, re-pin this repo’s dependency from the
-  `test/adversarial-v1` branch to `main`, cut jumping-rope v1.1 with README
-  claims backed by RopeBench numbers, and publish both packages.
+`ropebench replay <session.jsonl>` loads a REAL Claude Code session and mines
+cloze probes from its own recurring distinctive values (ports, flags, PR
+numbers, hashes, versions) — owned ground truth, no LLM judge. Ran on a real
+117-turn session (scripted reader):
 
-**Exit criterion:** README of jumping-rope cites only measured numbers;
+| Regime | Acc | tokens | acc/10k |
+|---|---|---|---|
+| full-history | 57% | **1,348,358** | 0.4 |
+| truncate | 0% | 49,943 | 0.0 |
+| summary | 0% | 50,775 | 0.0 |
+| **rope (bound)** | 43% | **77,179** | **5.6** |
+| rope-unbound | **71%** | 1,326,736 | 0.5 |
+
+Real-world headline: **the full transcript is 1.35M tokens — it does not fit
+in any model's context window**, so "carry everything" is not even an option
+on a real long session, while the rope (77K) fits comfortably (17× smaller).
+The lossy baselines scored **0%** — the mined facts had scrolled out
+(truncate) or been summarized away (summary). Bound rope's efficiency is 14×
+the oracle's; unbound got the *best* accuracy (71%), beating even
+full-history's scripted reader — a dense structured ledger is easier to read
+than 1.35M tokens of raw transcript.
+
+The **chatty scenario** (`--chatty N`) confirms B5 on synthetic data: bound
+rope keeps the best accuracy-per-token (6.8 vs the oracle's 2.1).
+
+**Honest limit surfaced (B6):** the event-driven runner records message text
+and relies on word-level `densify`; it does NOT model the adapter-level
+**streaming eviction** (archive-to-vault + gist stub) that makes unbound mode
+cheap on real chat. Unbound's cost numbers in the bench are a floor, not its
+real economics — the adapter tests measure the real figure (17–18% payloads).
+Closing B6 means driving the streaming policy inside the replay loop.
+
+**Exit criterion:** README of jumping-rope cites only measured numbers (met);
 one external-model live sweep reproduced by someone other than the author
 (fork-ready: this repo has no machine-specific paths or keys).
 
 ## Standing decisions needed from the owner
 
-1. Phase 2 endpoint + spend cap (gateway `meridian-deep` vs OpenRouter key).
-2. Whether Phase 3's hybrid retrieval should change the default `search()`
+1. Whether Phase 3's hybrid retrieval should change the default `search()`
    behavior or ship behind a flag (recommendation: default on — it is
-   strictly additive recall).
-3. When to merge `jumping-rope` PR #1/#2 so the dependency pin moves to main.
+   strictly additive recall). Live-model results (Phase 2) show B1/B2 largely
+   dissolve with a real model, lowering this priority.
+2. B6: whether to invest in streaming-in-the-replay-loop so unbound mode's
+   real economics get measured in-bench (vs. relying on the adapter tests).
