@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import sys
+
 from ropebench.models import OpenAICompatModel, ScriptedModel
 
 CONTEXT = """cwd:/srv/app
@@ -96,3 +98,32 @@ def test_live_adapter_bounded_retrieval_rounds() -> None:
     )
     answer = model.answer(CONTEXT, "q?", retrieve=lambda q: "RETRIEVED|k|nothing")
     assert answer.text.startswith("RETRIEVE:")  # gave up after the cap
+
+
+FAKE_CMD = [
+    sys.executable, "-c",
+    "import sys; d = sys.stdin.read(); "
+    "print('RETRIEVE: pinned build' if 'RETRIEVAL RESULT' not in d "
+    "else 'it is pinned to flint-9001')",
+]
+
+
+def test_command_model_plain_and_retrieval_loop() -> None:
+    from ropebench.models import CommandModel
+
+    model = CommandModel(argv=FAKE_CMD)
+    answer = model.answer(
+        CONTEXT,
+        "What build is the dusky keel pipeline pinned to?",
+        retrieve=lambda q: "RETRIEVED|tv-abc|pinned to build flint-9001",
+    )
+    assert "flint-9001" in answer.text
+    assert answer.used_retrieval
+
+
+def test_command_model_failure_scores_as_miss() -> None:
+    from ropebench.models import CommandModel
+
+    model = CommandModel(argv=[sys.executable, "-c", "import sys; sys.exit(3)"])
+    answer = model.answer(CONTEXT, "anything?")
+    assert answer.text == ""
