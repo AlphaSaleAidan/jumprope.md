@@ -53,6 +53,30 @@ turn-by-turn index of the conversation (each saved message gets a
 Switching is one flag: `jrope init --mode unbound`, `JumpConfig.unbound()`
 in Python, the `MODE` valve in Open WebUI, `JROPE_MODE` for the proxy.
 
+**Stack them.** The modes compose as lifecycle phases: work **unbound**
+while a session is hot (zero recall risk), then run `jrope retire
+--budget 2000` when it goes cold — one explicit pass that vaults everything
+over budget and leaves the compact bound artifact. Deliberately never
+automatic: surprise mid-flow compaction is the failure mode unbound exists
+to avoid.
+
+---
+
+## Which feature, when
+
+| Feature | Reach for it when |
+|---|---|
+| **BOUND mode** | unattended agents running days, small/expensive context windows, billed middleware, churn-heavy sessions |
+| **UNBOUND mode** | interactive work where a missed lookup stalls you; big cheap context windows; hours-to-days sessions |
+| **`retire`** | a hot unbound session goes cold: end of day, project handoff — compact it to a ~2k artifact, everything else vaulted |
+| **`symbolic-en` notation** | the default — 42% fewer tokens than prose, always on |
+| **`ai-native` notation** | long repetitive sessions (agents doing similar operations all day) — learns the session's own phrases, another ~17% off |
+| **The vault + `jrope query`** | any "what was that detail from earlier?" moment — exact-key or semantic lookup instead of scrolling |
+| **Turn provenance (`t42·` stamps)** | auditing: every vaulted item's K-line tells you which conversation turn produced it |
+| **Claude Code skill** | long coding sessions in Claude Code — maintains ROPE.md automatically, re-seeds after compaction |
+| **Open WebUI pipe** | self-hosted chat UIs — paste one file, get streaming eviction per conversation |
+| **OpenAI-compatible proxy** | any existing stack (middleware): point the client at the proxy, sessions get ropes transparently |
+
 ---
 
 ## 3. What the rope actually looks like
@@ -191,11 +215,18 @@ more than tokens do.
 | Post-clear payload is small | <20% of full history | 17–18% | pass |
 | Beats lossy baselines on old facts, cheaper than the ceiling | — | 100% vs 67/24, at 53% cost (bound) | pass |
 | A cold session can recover vaulted facts through the index | ≥19/20 | 20/20 | pass |
-| A live LLM keeps ≥90% of its ceiling accuracy on the rope | at ≤35% of tokens | **pending — next phase** | — |
+| A live LLM keeps ≥90% of its ceiling accuracy on the rope | ≥90% | **100% — equals the ceiling** (Haiku, 3 seeds × 80 turns), at 54% of its tokens, 0 hallucinated answers | pass |
 
-The last row is the honest one: everything above was measured with a
-deterministic reader (it proves the information is *findable*). The live
-phase swaps in a real model to prove the model actually *uses* it.
+The last row is the live-model run (Haiku 4.5, 390 probe calls): the model
+on the bound rope was **indistinguishable from the same model carrying the
+full transcript** — and it beat the deterministic reader, because a real
+model composes better vault queries than literal keyword matching. It used
+the retrieval tool on 56% of questions. One honest recalibration: the
+original cost target ("≤35%") belongs to post-clear *payload* size (the
+adapters measure 17–18% there); under this benchmark's pay-every-turn cost
+model the correct number is **54% of the oracle's bill at equal accuracy**.
+The lossy baselines got *worse* live: auto-summarize fell to 14% on old
+facts — a real model cannot reconstruct what summaries destroyed.
 
 ---
 
