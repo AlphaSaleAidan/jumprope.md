@@ -70,7 +70,7 @@ def test_malformed_lines_are_skipped() -> None:
 
 def test_cli_replay(tmp_path: Path) -> None:
     result = subprocess.run(
-        [sys.executable, "-m", "ropebench.cli", "replay", str(FIXTURE),
+        [sys.executable, "-m", "ropebench.cli", "run", "--transcript", str(FIXTURE),
          "--mode", "scripted", "--out", str(tmp_path / "out")],
         capture_output=True, text=True, check=False,
     )

@@ -18,6 +18,7 @@ dev = ["pytest>=8.0", "ruff>=0.4", "mypy>=1.10"]
 
 [project.scripts]
 ropebench = "ropebench.cli:main"
+jrope-bench = "ropebench.cli:main"
 
 [tool.hatch.metadata]
 allow-direct-references = true
@@ -37,4 +38,8 @@ python_version = "3.11"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+addopts = "-q -m 'not local and not api'"
+markers = [
+    "local: needs a local model endpoint (Ollama/GPU) — not run in CI",
+    "api: makes paid frontier API calls — needs JROPE_BENCH_BUDGET_USD — not in CI",
+]

@@ -79,7 +79,7 @@ def test_report_artifacts() -> None:
     assert "| rope |" in table
     rows = csv_rows(metrics)
     assert rows.splitlines()[0].startswith("regime,probe_tag")
-    assert len(rows.splitlines()) == 1 + 5 * 26  # header + 5 regimes × 26 probes
+    assert len(rows.splitlines()) == 1 + 5 * 30  # header + 5 regimes × 30 probes
 
 
 def test_cli_scripted_run(tmp_path: Path) -> None:
