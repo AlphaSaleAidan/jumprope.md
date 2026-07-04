@@ -1,0 +1,61 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b0e14;min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;
+  font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;padding:40px}
+h1{color:#E7EEF9;font-family:-apple-system,Arial,sans-serif;font-size:26px;font-weight:800;margin-bottom:6px}
+.sub{color:#93A4C3;font-family:-apple-system,Arial,sans-serif;font-size:15px;margin-bottom:22px}
+.term{background:#0e1420;border:1px solid #1c2740;border-radius:12px;padding:16px 20px;
+  width:560px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.line{font-size:22px;letter-spacing:1px;white-space:pre;display:flex;align-items:center;gap:12px}
+.cap{color:#5b6b8c;font-family:-apple-system,Arial,sans-serif;font-size:12px;
+  letter-spacing:.15em;text-transform:uppercase;margin:2px 0 -4px 4px}
+.dim{color:#4A5F86}
+</style></head><body>
+<h1>🪢 rope gauge · Claude Code statusline</h1>
+<div class="sub">color shifts warmer &amp; pulses <b>faster</b> as the rope fills toward its budget</div>
+<div id="rows"></div>
+<script>
+const BAR_W=14, FILLED='█', EMPTY='░';
+const lerp=(a,b,t)=>a.map((v,i)=>Math.round(v+(b[i]-v)*t));
+function fillColor(f){f=Math.max(0,Math.min(1,f));
+  const s=[[0,[52,211,153]],[0.5,[245,200,66]],[0.78,[245,158,11]],[1,[239,68,68]]];
+  for(let i=0;i<s.length-1;i++){const[t0,c0]=s[i],[t1,c1]=s[i+1];
+    if(f<=t1)return lerp(c0,c1,t1>t0?(f-t0)/(t1-t0):0);}return s[s.length-1][1];}
+function pulse(f,now){const freq=1.1+f*7.5;return 0.62+0.38*(0.5+0.5*Math.sin(now*freq));}
+const rgb=c=>`rgb(${c[0]},${c[1]},${c[2]})`;
+
+const cases=[
+  {cap:'plenty of headroom', tok:511, bud:2000, j:1},
+  {cap:'getting fuller', tok:1180, bud:2000, j:2},
+  {cap:'working harder', tok:1700, bud:2000, j:4},
+  {cap:'about to jump', tok:2160, bud:2000, j:5},
+];
+const rows=document.getElementById('rows');
+cases.forEach(c=>{
+  const wrap=document.createElement('div');
+  const cap=document.createElement('div');cap.className='cap';cap.textContent=c.cap;
+  const term=document.createElement('div');term.className='term';
+  const line=document.createElement('div');line.className='line';line.dataset.i=1;
+  term.appendChild(line);wrap.appendChild(cap);wrap.appendChild(term);rows.appendChild(wrap);
+  c.el=line;
+});
+function human(n){return n>=1000?(n/1000).toFixed(1)+'k':''+n;}
+function frame(t){const now=t/1000;
+  cases.forEach(c=>{
+    const fill=c.tok/c.bud, over=fill>=1;
+    const filled=Math.min(BAR_W,Math.round(Math.min(fill,1)*BAR_W));
+    const b=pulse(Math.min(fill,1.05),now), col=rgb(fillColor(fill).map(v=>Math.round(v*b)));
+    const bar=`<span style="color:${col}">${FILLED.repeat(filled)}</span>`+
+              `<span class="dim">${EMPTY.repeat(BAR_W-filled)}</span>`;
+    c.el.innerHTML=`🪢 <span style="letter-spacing:2px">${bar}</span> `+
+      `<span style="color:${col};font-weight:700">${human(c.tok)}</span>`+
+      `<span class="dim">/${human(c.bud)}</span> `+
+      `<span style="color:${col}">${Math.min(fill,1)*100|0}%</span>`+
+      (over?` <span style="color:rgb(239,68,68);font-weight:800">JUMP!</span>`:'')+
+      ` <span class="dim">j${c.j}</span>`;
+  });
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script></body></html>
