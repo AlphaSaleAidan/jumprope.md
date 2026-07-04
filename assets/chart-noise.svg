@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 470" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
+<rect width="920" height="470" rx="18" fill="#0B1220"/>
+<text x="70" y="44" fill="#E7EEF9" font-size="21" font-weight="700">The chattier the session, the more the rope pulls ahead</text>
+<text x="70" y="70" fill="#93A4C3" font-size="14">Accuracy as conversational filler grows · lossy strategies collapse, the rope degrades gracefully</text>
+<line x1="70" y1="406" x2="760" y2="406" stroke="#22314F" stroke-dasharray="none"/>
+<text x="62" y="410" fill="#93A4C3" font-size="11" text-anchor="end">0%</text>
+<line x1="70" y1="349" x2="760" y2="349" stroke="#22314F" stroke-dasharray="3 5"/>
+<text x="62" y="353" fill="#93A4C3" font-size="11" text-anchor="end">20%</text>
+<line x1="70" y1="292" x2="760" y2="292" stroke="#22314F" stroke-dasharray="3 5"/>
+<text x="62" y="296" fill="#93A4C3" font-size="11" text-anchor="end">40%</text>
+<line x1="70" y1="234" x2="760" y2="234" stroke="#22314F" stroke-dasharray="3 5"/>
+<text x="62" y="238" fill="#93A4C3" font-size="11" text-anchor="end">60%</text>
+<line x1="70" y1="177" x2="760" y2="177" stroke="#22314F" stroke-dasharray="3 5"/>
+<text x="62" y="181" fill="#93A4C3" font-size="11" text-anchor="end">80%</text>
+<line x1="70" y1="120" x2="760" y2="120" stroke="#22314F" stroke-dasharray="3 5"/>
+<text x="62" y="124" fill="#93A4C3" font-size="11" text-anchor="end">100%</text>
+<text x="70" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">0×</text>
+<text x="242" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">2×</text>
+<text x="415" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">4×</text>
+<text x="588" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">8×</text>
+<text x="760" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">16×</text>
+<text x="415" y="450" fill="#93A4C3" font-size="12" text-anchor="middle">filler multiplier</text>
+<polyline points="70,120 242,120 415,120 588,120 760,120" fill="none" stroke="#34D399" stroke-width="2.5"/>
+<circle cx="70" cy="120" r="3.5" fill="#34D399"/>
+<circle cx="242" cy="120" r="3.5" fill="#34D399"/>
+<circle cx="415" cy="120" r="3.5" fill="#34D399"/>
+<circle cx="588" cy="120" r="3.5" fill="#34D399"/>
+<circle cx="760" cy="120" r="3.5" fill="#34D399"/>
+<text x="770" y="110" fill="#34D399" font-size="12" font-weight="600">carry everything</text>
+<polyline points="70,140 242,180 415,200 588,226 760,280" fill="none" stroke="#60A5FA" stroke-width="4"/>
+<circle cx="70" cy="140" r="3.5" fill="#60A5FA"/>
+<circle cx="242" cy="180" r="3.5" fill="#60A5FA"/>
+<circle cx="415" cy="200" r="3.5" fill="#60A5FA"/>
+<circle cx="588" cy="226" r="3.5" fill="#60A5FA"/>
+<circle cx="760" cy="280" r="3.5" fill="#60A5FA"/>
+<text x="770" y="284" fill="#60A5FA" font-size="12" font-weight="700">ROPE</text>
+<polyline points="70,160 242,229 415,260 588,286 760,360" fill="none" stroke="#F59E0B" stroke-width="2.5"/>
+<circle cx="70" cy="160" r="3.5" fill="#F59E0B"/>
+<circle cx="242" cy="229" r="3.5" fill="#F59E0B"/>
+<circle cx="415" cy="260" r="3.5" fill="#F59E0B"/>
+<circle cx="588" cy="286" r="3.5" fill="#F59E0B"/>
+<circle cx="760" cy="360" r="3.5" fill="#F59E0B"/>
+<text x="770" y="354" fill="#F59E0B" font-size="12" font-weight="600">truncate</text>
+<polyline points="70,200 242,260 415,280 588,294 760,360" fill="none" stroke="#A78BFA" stroke-width="2.5"/>
+<circle cx="70" cy="200" r="3.5" fill="#A78BFA"/>
+<circle cx="242" cy="260" r="3.5" fill="#A78BFA"/>
+<circle cx="415" cy="280" r="3.5" fill="#A78BFA"/>
+<circle cx="588" cy="294" r="3.5" fill="#A78BFA"/>
+<circle cx="760" cy="360" r="3.5" fill="#A78BFA"/>
+<text x="770" y="376" fill="#A78BFA" font-size="12" font-weight="600">auto-summarize</text>
+</svg>

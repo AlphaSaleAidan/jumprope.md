@@ -266,9 +266,15 @@ just expensive on a real long session; it is impossible.
 An autonomous research loop is testing independent predictions of the theory.
 The first: **the memory hierarchy's payoff grows with session length**.
 Carry-everything's cost grows O(n¹·³⁴) (every turn pays for all prior turns);
-the rope's grows O(n⁰·⁷³). By 260 turns the rope is **4.5× cheaper**. Three more
+the rope's grows O(n⁰·⁷³). By 260 turns the rope is **4.5× cheaper**. Four more
 confirmed sub-theories (density has a floor, structure beats a flat blob, tighter
-budgets win) are in `ropebench/THEORY.md`.
+budgets win, and the rope is noise-robust) are in `ropebench/THEORY.md`.
+
+<p align="center"><img src="assets/chart-noise.svg" width="900" alt="accuracy vs conversational filler — the rope degrades gracefully while truncate and summarize collapse"></p>
+
+The chattier the session, the more the rope pulls ahead: at 16× filler it holds
+44% while truncate and summarize collapse to 16% — the rope's margin over the
+strategies frameworks actually ship *widens* with real-world noise.
 
 ---
 
