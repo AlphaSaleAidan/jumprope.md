@@ -259,6 +259,19 @@ just expensive on a real long session; it is impossible.
 
 ---
 
+## Bonus finding: the longer the session, the more the rope wins
+
+<p align="center"><img src="assets/chart-scaling.svg" width="900" alt="token cost vs session length — carry-everything explodes, the rope stays flat"></p>
+
+An autonomous research loop is testing independent predictions of the theory.
+The first: **the memory hierarchy's payoff grows with session length**.
+Carry-everything's cost grows O(n¹·³⁴) (every turn pays for all prior turns);
+the rope's grows O(n⁰·⁷³). By 260 turns the rope is **4.5× cheaper**. Three more
+confirmed sub-theories (density has a floor, structure beats a flat blob, tighter
+budgets win) are in `ropebench/THEORY.md`.
+
+---
+
 ## 6. How it was hardened
 
 1. **52 mechanics tests** — the token cap is re-checked after every single
