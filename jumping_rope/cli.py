@@ -71,6 +71,13 @@ def build_parser() -> argparse.ArgumentParser:
     p_jump = sub.add_parser("jump", help="perform a jump; prints the rope")
     _add_data_dir(p_jump)
 
+    p_retire = sub.add_parser(
+        "retire",
+        help="compact an unbound session down to a bound rope (prints it)",
+    )
+    _add_data_dir(p_retire)
+    p_retire.add_argument("--budget", type=int, default=2_000)
+
     p_query = sub.add_parser("query", help="retrieve demoted content")
     _add_data_dir(p_query)
     p_query.add_argument("text")
@@ -119,6 +126,8 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(session.status(), indent=2))
         elif args.command == "jump":
             print(session.jump(), end="")
+        elif args.command == "retire":
+            print(session.retire(budget_tokens=args.budget), end="")
         elif args.command == "query":
             result = session.retrieve(args.text, k=args.k)
             print(result if result else "NO-HIT")

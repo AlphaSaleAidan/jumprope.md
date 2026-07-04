@@ -113,3 +113,9 @@ Micro-decisions made where the spec left room, and why.
 23. **Streaming outbound can exceed a tiny naive history** by the rope's
     fixed overhead (same effect as A13); the flat-growth property is what
     matters and is what tests assert.
+24. **`retire` — the modes stack as lifecycle phases.** Work unbound while
+    the session is hot (perfect verbatim recall), then one explicit
+    `session.retire(budget)` / `jrope retire` pass compacts the rope to a
+    bound handoff artifact (demotion + jump) and the session stays bound.
+    Deliberately never automatic: silent mid-flow compaction is the failure
+    mode unbound exists to avoid. Validated on the A20 switch path.
