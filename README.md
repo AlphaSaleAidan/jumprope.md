@@ -8,6 +8,42 @@
 by keeping the session's memory in a small ledger instead of the chat
 history.**
 
+### Wait — what is this, in plain English?
+
+Every time you chat with an AI, it silently **re-reads the entire conversation**
+before it replies. On a long chat that means three things go wrong: it gets
+**slow**, it gets **expensive** (you pay per word, every turn), and it starts
+**forgetting the early stuff** because the important bits get buried under
+thousands of words of back-and-forth.
+
+Jumping Rope gives the AI a **cheat sheet**. Instead of re-reading the whole
+chat, it keeps one tight page — the *rope* — with only what actually matters:
+the facts, the decisions, the open questions. Everything else gets filed in a
+labeled drawer — the *vault* — that the AI can open with a quick lookup when it
+needs a detail back. The raw chat history becomes disposable: you can wipe it and
+lose nothing, because nothing important lived only there.
+
+That's it. **Cheat sheet + searchable drawer, kept up to date automatically.**
+
+**The 30-second version:**
+- 🧠 **Remembers longer** — the important stuff sits on a one-page cheat sheet, so it doesn't get buried and forgotten.
+- 💸 **Costs way less** — the AI carries the cheat sheet (small) instead of the whole chat (huge). ~4–18× fewer tokens on long sessions.
+- 🔬 **Proven, not vibes** — there's a whole benchmark (`ropebench/`) with confidence intervals. It beats the "summarize the chat" trick every tool ships, by a lot.
+
+### Try it (about 30 seconds)
+
+```bash
+git clone https://github.com/AlphaSaleAidan/jumprope.md && cd jumprope.md
+pip install -e "./jumping-rope[dev]"
+python jumping-rope/examples/demo_session.py   # watch a rope get built + a jump happen
+```
+
+Using Claude Code? Drop in the `jumping-rope` skill (see [Agent brain](#agent-brain))
+and it maintains the cheat sheet for you. Want the receipts? Jump to
+[Does it actually work?](#5-does-it-actually-work-measured-not-vibes).
+
+---
+
 The color code used in every diagram below: **yellow** = the chat history,
 **blue** = the rope (the ledger), **purple** = the vault (deep storage),
 **green** = the model.

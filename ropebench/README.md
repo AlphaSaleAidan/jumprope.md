@@ -10,7 +10,9 @@ strategy. Every number below traces to a row in [CLAIMS.md](CLAIMS.md) with its
 sample size and 95% CI; reproduce them with [REPRODUCE.md](REPRODUCE.md).
 
 ```bash
-pip install -e ".[dev]"
+# from the monorepo root — install the rope from the sibling dir, then the bench
+pip install -e ./jumping-rope
+pip install -e "./ropebench[dev]" --no-deps
 
 # measure your own Claude Code session
 jrope-bench convert my-session.jsonl bench.jsonl
@@ -22,8 +24,8 @@ cat out/report_card.md          # headline + paired CIs + verdicts
 The strategies compared (the "conditions"): **carry** (full history — the
 oracle, and the cost worst case), **truncate** (drop oldest), **summarize**
 (what most frameworks do by default), **rope** (a real
-[Jumping Rope](https://github.com/AlphaSaleAidan/jumping-rope) session — the
-reference implementation), and **rope-unbound / streaming**.
+[Jumping Rope](../jumping-rope) session — the reference implementation), and
+**rope-unbound / streaming**.
 
 ---
 
