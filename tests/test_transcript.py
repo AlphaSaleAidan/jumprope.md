@@ -78,3 +78,19 @@ def test_cli_replay(tmp_path: Path) -> None:
     assert "transcript:" in result.stdout
     assert "| rope |" in result.stdout
     assert (tmp_path / "out" / "report.md").exists()
+
+
+def test_empty_and_valueless_transcripts_dont_crash(tmp_path: Path) -> None:
+    empty = tmp_path / "empty.jsonl"
+    empty.write_text("")
+    assert load(empty).stats.probes == 0
+
+    valueless = tmp_path / "valueless.jsonl"
+    valueless.write_text("\n".join(
+        json.dumps({"type": "user", "message": {"role": "user",
+                    "content": "please keep tidying the helper code and move along"}})
+        for _ in range(30)
+    ))
+    loaded = load(valueless)
+    assert loaded.stats.turns_kept == 30
+    assert loaded.stats.probes == 0  # nothing distinctive to ask about

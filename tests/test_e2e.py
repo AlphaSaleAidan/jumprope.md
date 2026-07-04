@@ -125,3 +125,21 @@ def test_chatty_scenario_rope_efficiency_wins() -> None:
     assert rope.accuracy() >= 0.65
     # And the lossy baselines degrade hard on the padded stream.
     assert metrics["summary"].accuracy(bucket="long") < 0.3
+
+
+def test_chatty_is_deterministic_and_preserves_values() -> None:
+    from ropebench.scenario import generate
+
+    a = generate(7, n_turns=60, chatty=4)
+    b = generate(7, n_turns=60, chatty=4)
+    assert a.turns == b.turns and a.probes == b.probes
+    # chatty=0 must equal the default (no regression)
+    assert generate(5).turns == generate(5, chatty=0).turns
+    # the answer value survives the padding
+    s = generate(3, n_turns=60, chatty=6)
+    for probe in s.probes:
+        if probe.kind in ("fact", "decision"):
+            assert any(
+                probe.expected_any[0] in e.text
+                for turn in s.turns for e in turn
+            ), probe.tag
