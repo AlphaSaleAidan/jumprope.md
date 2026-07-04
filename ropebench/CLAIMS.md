@@ -23,6 +23,7 @@ Regenerate CI-tier rows from a fresh clone with the commands in
 | C14 | **T7** — flat semantic recall of a specific fact collapses under near-duplicates | 100%→0% (N=0→64); rope exact-fetch 100% throughout | 8 seeds × 20 targets | tracks/undershoots chance k/(N+1) | `tests/test_theory_t7.py`, `research/exp_t7_distractors.py` | `pytest -m local tests/test_theory_t7.py` |
 | C15 | **T7** — AI-native coding makes semantic search fail *faster* (widens exact-vs-semantic gap) | flat 48%→33% at N=4 (symbolic→ai-native); rope 100% both | 8 seeds × 20 targets | — | same | same |
 | C16 | **T5** — no lost-in-the-middle for a single needle up to 21k tok (live Haiku) | 72/72 recalled at depth 5/50/95% | 8 targets × 3 depths × 3 sizes | honest NULL — position isn't the rope's edge | `tests/test_theory_t5.py`, `results/t5-ordering/` | `pytest tests/test_theory_t5.py` |
+| C17 | **T9** — on REAL code (Python 3.12 stdlib, ~1.03M tok), semantic recall of a specific same-named function tracks coin-flip; exact file::symbol 100% | semantic 58%→20% (N=4→16); rope 100% | 60/39/15 targets by N | ~1.03M tok fits no window; no LITM for a distinctive marker at 80k (12/12) | `tests/test_theory_t9.py`, `results/t9-codescale/` | `pytest tests/test_theory_t9.py` |
 
 ## Corrected claims (correction history, kept visible)
 

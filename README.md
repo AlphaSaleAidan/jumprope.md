@@ -302,10 +302,11 @@ just expensive on a real long session; it is impossible.
 An autonomous research loop is testing independent predictions of the theory.
 The first: **the memory hierarchy's payoff grows with session length**.
 Carry-everything's cost grows O(n¹·³⁴) (every turn pays for all prior turns);
-the rope's grows O(n⁰·⁷³). By 260 turns the rope is **4.5× cheaper**. Five more
+the rope's grows O(n⁰·⁷³). By 260 turns the rope is **4.5× cheaper**. Six more
 confirmed sub-theories (density has a floor, structure beats a flat blob, tighter
-budgets win, the rope is noise-robust, and exact addressing beats semantic search
-under distractors) are in `ropebench/THEORY.md`.
+budgets win, the rope is noise-robust, exact addressing beats semantic search
+under distractors, and this all holds on a real 875k-line codebase) are in
+`ropebench/THEORY.md`.
 
 <p align="center"><img src="assets/chart-noise.svg" width="900" alt="accuracy vs conversational filler — the rope degrades gracefully while truncate and summarize collapse"></p>
 
@@ -326,6 +327,22 @@ stronger** — denser coding strips even more surface variance, so semantic sear
 fails *faster* (48%→33% at four distractors) while the exact fetch is unmoved.
 That is the counter-intuitive punchline: the denser and more coded your memory,
 the *more* you need to address it by key instead of searching it by meaning.
+
+### And this is exactly why it matters for a big codebase
+
+<p align="center"><img src="assets/chart-codescale.svg" width="900" alt="on 875,000 lines of real code, semantic search for a specific function collapses to a coin flip while exact file::symbol addressing stays 100%"></p>
+
+We ran that same contest on a **real 875,000-line codebase** — the actual Python
+3.12 standard library (~1.03M tokens, which fits in *no* context window, so
+"just paste the repo" is off the table from the start). A big codebase is the
+*natural habitat* of near-duplicates: hundreds of functions called `close`,
+`read`, `run`, `__init__`. Ask "recall this specific one" and semantic search
+**tracks a coin flip** (58% → 20% as the same-named copies pile up), while an
+exact `file::symbol` handle stays at **100%**. Position isn't the problem — a
+model finds a *distinctive* marker fine even at 80k tokens of real code (12/12).
+The problem is telling near-duplicates apart, and that is precisely what
+addressing-by-key solves and searching-by-meaning cannot. **On huge codebases you
+don't want the AI to *search* its memory — you want it to *address* it.**
 
 ---
 

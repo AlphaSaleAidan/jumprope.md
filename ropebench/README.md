@@ -133,6 +133,13 @@ sub-theories of the core claim. Confirmed so far (each with a regression test in
   lost-in-the-middle** at these scales. Recorded as a null, not spun: it *rules
   out* the story that the rope wins by dodging positional weakness. It doesn't;
   it wins on cost (T1/T4) and noise (T7/T8).
+- **T9 — it holds on a real 875k-line codebase.** Ran the T7 contest on the
+  actual Python 3.12 standard library (~1.03M tokens — fits in no window).
+  Recalling one specific function when N others share its name: semantic search
+  **tracks the coin-flip** (58%→20% as N grows), exact `file::symbol` addressing
+  stays **100%**. A big codebase is T7's natural habitat — hundreds of same-named
+  `close`/`read`/`run`. (And no lost-in-the-middle for a *distinctive* marker even
+  at 80k tokens of real code, 12/12 — position still isn't the lever.)
 
 The statistics themselves are validated: over 100k simulated experiments the
 bootstrap 95% CI covers the true value ~95% of the time.

@@ -182,3 +182,41 @@ much longer contexts (30k–100k+), and answers requiring reasoning across posit
 — untested here and out of scope for a free CLI sweep. Shipped `test_theory_t5.py`
 (pins the artifact so the null can't rot) + `research/exp_t5_ordering.py` +
 `results/t5-ordering/`.
+
+### Entry 9 — T9 CONFIRMED: the pattern holds on a REAL 875k-line codebase (2026-07-04)
+Prompted by Aidan's question — "what about recall against 150k+ lines of code?"
+Ran the T7 contest on genuine code: the Python 3.12 standard library
+(/usr/lib/python3.12), 11,798 functions sampled, **~1,033,908 tokens** — a
+codebase this size fits in *no* context window, so "carry everything" is off the
+table from the start.
+
+**Part A (scripted, free) — exact-key vs semantic recall of a SPECIFIC function
+when N others share its name (real near-duplicates):**
+| N same-named | flat semantic | rope exact (file::symbol) | chance k/(N+1) | targets |
+|---|---|---|---|---|
+| 0 | 100% | 100% | 100% | 60 |
+| 4 | 58% | **100%** | 60% | 60 |
+| 8 | 31% | **100%** | 33% | 39 |
+| 16 | 20% | **100%** | 18% | 15 |
+| 32 | 29% | **100%** | 9% | 7 |
+
+Semantic recall **tracks the coin-flip line** on real code (58≈60, 31≈33, 20≈18;
+N=32 noisy at 7 targets). Exact addressing is 100% throughout. **T7's mechanism is
+not a synthetic artifact — a real codebase is its natural habitat:** every large
+repo has hundreds of same-named `close`/`read`/`run` methods, and "search by
+meaning" cannot say which one you meant.
+
+**Part B (bounded live, local Haiku, no Meridian) — does lost-in-the-middle bite
+at code scale?** Packed real code to **80,435 tokens**, hid one distinctive marker
+at depth 10/50/90%: **12/12 recalled, all depths.** No LITM for a *distinctive*
+needle even at 80k of real code — consistent with T5.
+
+**The honest synthesis (answers the question precisely):** yes, rope+vault helps
+enormously on a huge codebase — but via T7 + "doesn't fit" (T1), NOT via dodging
+position. Position isn't the failure mode; *disambiguating near-duplicates* is,
+and exact `file::symbol` addressing is exactly what fixes it. The Part B caveat is
+the whole point: a model finds a *distinctive* marker fine at 80k — but real code
+recall is never distinctive, it's "which of the 40 `close()` did I mean?", which
+is Part A, where semantic fails and the address wins. Shipped
+`test_theory_t9.py`, `research/exp_t9_codescale.py`, `results/t9-codescale/`,
+`assets/chart-codescale.svg`.
