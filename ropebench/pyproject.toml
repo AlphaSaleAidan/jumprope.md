@@ -38,6 +38,7 @@ python_version = "3.11"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]  # make research/ importable during collection (T7 exp)
 addopts = "-q -m 'not local and not api'"
 markers = [
     "local: needs a local model endpoint (Ollama/GPU) — not run in CI",

@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 470" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
+<rect width="920" height="470" rx="18" fill="#0B1220"/>
+<text x="70" y="44" fill="#E7EEF9" font-size="21" font-weight="700">Exact addressing shrugs off distractors; semantic search collapses</text>
+<text x="70" y="70" fill="#93A4C3" font-size="14">Recall of one specific fact as N near-duplicate distractors flood the store · denser AI-native coding fails even faster</text>
+<line x1="70" y1="406" x2="760" y2="406" stroke="#22314F"/>
+<text x="62" y="410" fill="#93A4C3" font-size="11" text-anchor="end">0%</text>
+<line x1="70" y1="349" x2="760" y2="349" stroke="#22314F" stroke-dasharray="3 5"/>
+<text x="62" y="353" fill="#93A4C3" font-size="11" text-anchor="end">20%</text>
+<line x1="70" y1="292" x2="760" y2="292" stroke="#22314F" stroke-dasharray="3 5"/>
+<text x="62" y="296" fill="#93A4C3" font-size="11" text-anchor="end">40%</text>
+<line x1="70" y1="234" x2="760" y2="234" stroke="#22314F" stroke-dasharray="3 5"/>
+<text x="62" y="238" fill="#93A4C3" font-size="11" text-anchor="end">60%</text>
+<line x1="70" y1="177" x2="760" y2="177" stroke="#22314F" stroke-dasharray="3 5"/>
+<text x="62" y="181" fill="#93A4C3" font-size="11" text-anchor="end">80%</text>
+<line x1="70" y1="120" x2="760" y2="120" stroke="#22314F" stroke-dasharray="3 5"/>
+<text x="62" y="124" fill="#93A4C3" font-size="11" text-anchor="end">100%</text>
+<text x="70" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">0</text>
+<text x="185" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">2</text>
+<text x="300" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">4</text>
+<text x="415" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">8</text>
+<text x="530" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">16</text>
+<text x="645" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">32</text>
+<text x="760" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">64</text>
+<text x="415" y="450" fill="#93A4C3" font-size="12" text-anchor="middle">near-duplicate distractors in the store (N)</text>
+<!-- chance line k/(N+1), faint -->
+<polyline points="70,120 185,120 300,234 415,312 530,354 645,380 760,392" fill="none" stroke="#4B5F86" stroke-width="1.5" stroke-dasharray="4 4"/>
+<text x="770" y="392" fill="#6B7EA6" font-size="11">chance k/(N+1)</text>
+<!-- rope exact address: flat at 100% -->
+<polyline points="70,120 185,120 300,120 415,120 530,120 645,120 760,120" fill="none" stroke="#34D399" stroke-width="4"/>
+<circle cx="70" cy="120" r="4" fill="#34D399"/><circle cx="300" cy="120" r="4" fill="#34D399"/><circle cx="530" cy="120" r="4" fill="#34D399"/><circle cx="760" cy="120" r="4" fill="#34D399"/>
+<text x="315" y="112" fill="#34D399" font-size="13" font-weight="700">rope — exact KEYS address · 100%</text>
+<!-- flat semantic, symbolic-en -->
+<polyline points="70,120 185,120 300,269 415,357 530,383 645,403 760,406" fill="none" stroke="#F59E0B" stroke-width="3"/>
+<circle cx="300" cy="269" r="3.5" fill="#F59E0B"/><circle cx="415" cy="357" r="3.5" fill="#F59E0B"/><circle cx="530" cy="383" r="3.5" fill="#F59E0B"/><circle cx="645" cy="403" r="3.5" fill="#F59E0B"/>
+<text x="330" y="262" fill="#F59E0B" font-size="12" font-weight="600">flat semantic search</text>
+<!-- flat semantic, ai-native: collapses further -->
+<polyline points="70,120 185,120 300,312 415,366 530,389 645,392 760,395" fill="none" stroke="#EF4444" stroke-width="3" stroke-dasharray="6 3"/>
+<circle cx="300" cy="312" r="3.5" fill="#EF4444"/><circle cx="415" cy="366" r="3.5" fill="#EF4444"/><circle cx="530" cy="389" r="3.5" fill="#EF4444"/>
+<text x="360" y="342" fill="#EF4444" font-size="12" font-weight="600">flat semantic · AI-native coded (fails faster)</text>
+<text x="70" y="464" fill="#6B7EA6" font-size="11">8 seeds × 20 targets · HashEmbedder brute-force vault · near-duplicates share every token but the value, so semantic rank ≈ random</text>
+</svg>

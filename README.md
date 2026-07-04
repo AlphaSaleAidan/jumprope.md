@@ -8,6 +8,42 @@
 by keeping the session's memory in a small ledger instead of the chat
 history.**
 
+### Wait — what is this, in plain English?
+
+Every time you chat with an AI, it silently **re-reads the entire conversation**
+before it replies. On a long chat that means three things go wrong: it gets
+**slow**, it gets **expensive** (you pay per word, every turn), and it starts
+**forgetting the early stuff** because the important bits get buried under
+thousands of words of back-and-forth.
+
+Jumping Rope gives the AI a **cheat sheet**. Instead of re-reading the whole
+chat, it keeps one tight page — the *rope* — with only what actually matters:
+the facts, the decisions, the open questions. Everything else gets filed in a
+labeled drawer — the *vault* — that the AI can open with a quick lookup when it
+needs a detail back. The raw chat history becomes disposable: you can wipe it and
+lose nothing, because nothing important lived only there.
+
+That's it. **Cheat sheet + searchable drawer, kept up to date automatically.**
+
+**The 30-second version:**
+- 🧠 **Remembers longer** — the important stuff sits on a one-page cheat sheet, so it doesn't get buried and forgotten.
+- 💸 **Costs way less** — the AI carries the cheat sheet (small) instead of the whole chat (huge). ~4–18× fewer tokens on long sessions.
+- 🔬 **Proven, not vibes** — there's a whole benchmark (`ropebench/`) with confidence intervals. It beats the "summarize the chat" trick every tool ships, by a lot.
+
+### Try it (about 30 seconds)
+
+```bash
+git clone https://github.com/AlphaSaleAidan/jumprope.md && cd jumprope.md
+pip install -e "./jumping-rope[dev]"
+python jumping-rope/examples/demo_session.py   # watch a rope get built + a jump happen
+```
+
+Using Claude Code? Drop in the `jumping-rope` skill (see [Agent brain](#agent-brain))
+and it maintains the cheat sheet for you. Want the receipts? Jump to
+[Does it actually work?](#5-does-it-actually-work-measured-not-vibes).
+
+---
+
 The color code used in every diagram below: **yellow** = the chat history,
 **blue** = the rope (the ledger), **purple** = the vault (deep storage),
 **green** = the model.
@@ -266,15 +302,30 @@ just expensive on a real long session; it is impossible.
 An autonomous research loop is testing independent predictions of the theory.
 The first: **the memory hierarchy's payoff grows with session length**.
 Carry-everything's cost grows O(n¹·³⁴) (every turn pays for all prior turns);
-the rope's grows O(n⁰·⁷³). By 260 turns the rope is **4.5× cheaper**. Four more
+the rope's grows O(n⁰·⁷³). By 260 turns the rope is **4.5× cheaper**. Five more
 confirmed sub-theories (density has a floor, structure beats a flat blob, tighter
-budgets win, and the rope is noise-robust) are in `ropebench/THEORY.md`.
+budgets win, the rope is noise-robust, and exact addressing beats semantic search
+under distractors) are in `ropebench/THEORY.md`.
 
 <p align="center"><img src="assets/chart-noise.svg" width="900" alt="accuracy vs conversational filler — the rope degrades gracefully while truncate and summarize collapse"></p>
 
 The chattier the session, the more the rope pulls ahead: at 16× filler it holds
 44% while truncate and summarize collapse to 16% — the rope's margin over the
 strategies frameworks actually ship *widens* with real-world noise.
+
+<p align="center"><img src="assets/chart-distractors.svg" width="900" alt="recall of a specific fact as near-duplicate distractors flood the store — exact addressing stays 100% while semantic search collapses"></p>
+
+And why does *structure* beat a flat dense blob? Because it makes an old fact
+**addressable**. Flood the store with near-duplicate facts (same sentence,
+different value) and ask for one back: pure semantic search collapses from 100%
+to 0% as the near-duplicates crowd in — the one distinctive token drowns, so the
+nearest-neighbour rank is no better than chance. The rope stamps every archived
+fact with an exact `KEYS` handle and fetches it by key: **100%, no matter how
+crowded the store gets.** Writing the rope in an **AI-native language makes this
+stronger** — denser coding strips even more surface variance, so semantic search
+fails *faster* (48%→33% at four distractors) while the exact fetch is unmoved.
+That is the counter-intuitive punchline: the denser and more coded your memory,
+the *more* you need to address it by key instead of searching it by meaning.
 
 ---
 
