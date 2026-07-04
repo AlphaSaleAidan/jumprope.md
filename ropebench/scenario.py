@@ -99,6 +99,16 @@ class Probe:
             return MEDIUM
         return LONG
 
+    def age_tercile(self, n_turns: int) -> str:
+        """Which third of the session the ground truth was introduced in —
+        for testing 'summaries eat OLD facts' by fact age."""
+        frac = self.ref_turn / max(1, n_turns)
+        if frac < 1 / 3:
+            return "early"
+        if frac < 2 / 3:
+            return "mid"
+        return "late"
+
 
 @dataclass
 class Scenario:
@@ -113,8 +123,8 @@ class Scenario:
 
 def generate(seed: int, n_turns: int = 80, chatty: int = 0) -> Scenario:
     rng = random.Random(seed)
-    adjectives = rng.sample(ADJECTIVES, 14)
-    nouns = rng.sample(NOUNS, 14)
+    adjectives = rng.sample(ADJECTIVES, 16)
+    nouns = rng.sample(NOUNS, 16)
     turns: list[list[Event]] = [[] for _ in range(n_turns)]
     probes: list[Probe] = []
     buckets = [SHORT, MEDIUM, LONG]
@@ -126,12 +136,12 @@ def generate(seed: int, n_turns: int = 80, chatty: int = 0) -> Scenario:
         probes.append(Probe(turn=turn, kind=kind, tag=tag, question=question,
                             expected_any=expected_any, ref_turn=ref_turn))
 
-    fact_step = max(2, (n_turns - 20) // 12)
+    fact_step = max(2, round(n_turns * 0.85 / 16))
     decision_step = max(3, (n_turns - 20) // 8)
     goal_step = max(3, (n_turns - 25) // 6)
 
-    # -- facts: 12, evenly spread, probed round-robin across buckets ---------
-    for i in range(12):
+    # -- facts: 16, evenly spread, probed round-robin across buckets ---------
+    for i in range(16):
         adj, noun = adjectives[i], nouns[i]
         value = f"{CHOICES[i % 8].split('-')[0]}-{rng.randint(1000, 9999)}"
         ref_turn = min(2 + i * fact_step, n_turns - 1)

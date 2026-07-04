@@ -40,6 +40,10 @@ _STOPVALUES = {"http", "https", "20", "200", "404", "100", "000"}
 
 
 def _message_text(obj: dict[str, object]) -> tuple[str, str]:
+    # Bench schema: {"role", "content"} at top level.
+    if "role" in obj and "content" in obj and "message" not in obj:
+        content = obj["content"]
+        return str(obj["role"]), content if isinstance(content, str) else ""
     msg = obj.get("message")
     if not isinstance(msg, dict):
         return "", ""
@@ -117,7 +121,10 @@ def load(
             obj = json.loads(raw)
         except json.JSONDecodeError:
             continue
-        if obj.get("type") not in ("user", "assistant"):
+        # Accept Claude Code rows (type user/assistant) and bench-schema rows
+        # (top-level role, no type).
+        is_bench_row = "role" in obj and "type" not in obj
+        if not is_bench_row and obj.get("type") not in ("user", "assistant"):
             continue
         role, text = _message_text(obj)
         stats.total_messages += 1

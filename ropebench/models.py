@@ -8,12 +8,14 @@ model over any OpenAI-compatible endpoint and measures *information use*.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import subprocess
 import urllib.request
 from collections.abc import Callable
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Protocol
 
 from jumping_rope.tokens import count_tokens
@@ -200,12 +202,48 @@ class OpenAICompatModel:
         api_key: str = "",
         chat_fn: ChatFn | None = None,
         max_retrieval_rounds: int = 2,
+        cache_dir: str | Path | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.model = model
         self.api_key = api_key
         self.chat_fn = chat_fn or self._http_chat
         self.max_retrieval_rounds = max_retrieval_rounds
+        self.cache_dir = Path(cache_dir) if cache_dir else None
+        self.cache_hits = 0
+        self.cache_misses = 0
+
+    @classmethod
+    def from_env(cls, model: str | None = None, **kwargs: object) -> OpenAICompatModel:
+        """Build from JROPE_BENCH_API_BASE / _API_KEY / _MODEL (S0)."""
+        import os
+
+        base = os.environ.get("JROPE_BENCH_API_BASE", "")
+        if not base:
+            raise RuntimeError("JROPE_BENCH_API_BASE is not set")
+        return cls(
+            base_url=base,
+            model=model or os.environ.get("JROPE_BENCH_MODEL", ""),
+            api_key=os.environ.get("JROPE_BENCH_API_KEY", ""),
+            **kwargs,  # type: ignore[arg-type]
+        )
+
+    def _cache_key(self, messages: list[dict[str, str]]) -> str:
+        blob = json.dumps([self.model, messages], sort_keys=True)
+        return hashlib.sha256(blob.encode("utf-8")).hexdigest()
+
+    def _chat_cached(self, messages: list[dict[str, str]]) -> str:
+        if self.cache_dir is None:
+            return self.chat_fn(messages)
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+        path = self.cache_dir / f"{self._cache_key(messages)}.txt"
+        if path.exists():
+            self.cache_hits += 1
+            return path.read_text(encoding="utf-8")
+        self.cache_misses += 1
+        reply = self.chat_fn(messages)
+        path.write_text(reply, encoding="utf-8")
+        return reply
 
     def _http_chat(self, messages: list[dict[str, str]]) -> str:
         request = urllib.request.Request(
@@ -239,7 +277,7 @@ class OpenAICompatModel:
         extra = 0
         used_retrieval = False
         for _ in range(self.max_retrieval_rounds + 1):
-            reply = self.chat_fn(messages).strip()
+            reply = self._chat_cached(messages).strip()
             match = re.match(r"^RETRIEVE:\s*(.+)$", reply, re.IGNORECASE)
             if match is None or retrieve is None:
                 return ModelAnswer(

@@ -17,7 +17,7 @@ def test_different_seeds_differ() -> None:
 
 def test_probe_counts_and_stratification() -> None:
     scenario = generate(3)
-    assert len(scenario.probes) == 12 + 8 + 6  # facts + decisions + goals
+    assert len(scenario.probes) == 16 + 8 + 6  # facts + decisions + goals
     buckets = {b: sum(p.bucket == b for p in scenario.probes)
                for b in (SHORT, MEDIUM, LONG)}
     assert all(count >= 5 for count in buckets.values()), buckets

@@ -10,6 +10,7 @@ from jumping_rope.tokens import count_tokens
 from .models import Model, ModelAnswer, ScriptedModel
 from .regimes import RegimeBase, default_regimes
 from .scenario import LONG, MEDIUM, SHORT, Probe, Scenario, generate
+from .stats import PairedResult, paired_bootstrap
 
 
 @dataclass
@@ -57,6 +58,33 @@ class RegimeMetrics:
 
 
 AnswerFn = Callable[[str, str, object], ModelAnswer]
+
+ProbeFilter = Callable[[Probe], bool]
+
+
+def paired(
+    metrics_a: RegimeMetrics,
+    metrics_b: RegimeMetrics,
+    where: ProbeFilter | None = None,
+    resamples: int = 10_000,
+    seed: int = 0,
+) -> PairedResult:
+    """Paired bootstrap CI comparing two conditions on the SAME probes.
+
+    Conditions are scored over an identical probe stream in identical order,
+    so aligning by index is aligning by probe (asserted).
+    """
+    a, b = metrics_a.probe_results, metrics_b.probe_results
+    if len(a) != len(b):
+        raise ValueError("conditions must have the same probe count")
+    a_hits, b_hits = [], []
+    for ra, rb in zip(a, b, strict=True):
+        if ra.probe.tag != rb.probe.tag:
+            raise ValueError("probe streams are not aligned")
+        if where is None or where(ra.probe):
+            a_hits.append(int(ra.hit))
+            b_hits.append(int(rb.hit))
+    return paired_bootstrap(a_hits, b_hits, resamples=resamples, seed=seed)
 
 
 def _score(probe: Probe, answer: str) -> bool:
@@ -118,12 +146,13 @@ def run_benchmark(
     model: Model | None = None,
     regime_factory: Callable[[], list[RegimeBase]] = default_regimes,
     chatty: int = 0,
+    only: list[str] | None = None,
 ) -> dict[str, RegimeMetrics]:
     active_model: Model = model if model is not None else ScriptedModel()
     runs = []
     for seed in seeds:
         scenario = generate(seed, n_turns=n_turns, chatty=chatty)
-        runs.append(run_scenario(scenario, regime_factory(), active_model))
+        runs.append(run_scenario(scenario, default_regimes(only=only), active_model))
     return merge(runs)
 
 
