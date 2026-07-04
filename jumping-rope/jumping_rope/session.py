@@ -270,6 +270,33 @@ class JumpingRopeSession:
         self.save()
         return text
 
+    def retire(self, budget_tokens: int = 2_000) -> str:
+        """Stack the modes: compact this session down to a BOUND rope.
+
+        The generational pattern — work unbound while the session is hot
+        (perfect verbatim recall), then retire it when it goes cold: one
+        explicit demotion pass moves everything over ``budget_tokens`` to
+        TurboVec and performs a jump. Returns the compact handoff artifact.
+        The session stays bound afterwards (persisted). Never automatic —
+        surprise mid-flow compaction is exactly what unbound mode exists
+        to avoid.
+        """
+        from dataclasses import replace
+
+        new_config = replace(self.meta.config, rope_budget_tokens=budget_tokens)
+        _validate_budget(new_config)  # loud on unsatisfiable budgets (A2)
+        self.meta.config = new_config
+        if hasattr(self.profile, "dict_token_budget"):
+            self.profile.dict_token_budget = max(16, budget_tokens // 8)
+        self.compactor = Compactor(
+            budget_tokens, self.store, expand=self.profile.expand
+        )
+        text = self.compactor.jump(self.rope, self._clock())
+        self.meta.turns_since_jump = 0
+        self.meta.live_context_tokens = count_tokens(text)
+        self.save()
+        return text
+
     # -- retrieval ---------------------------------------------------------------
 
     def retrieve(self, query: str, k: int = 5) -> str:

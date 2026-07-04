@@ -253,3 +253,72 @@ def test_cli_unbound_mode(tmp_path: Path) -> None:
     status = json.loads(jrope(["status"]).stdout)
     assert status["mode"] == "unbound"
     assert status["rope_budget_tokens"] is None
+
+
+# -- retire: stacking the modes (work unbound, retire to bound) -----------------
+
+
+def test_retire_compacts_unbound_session_to_bound(
+    tmp_path: Path, clock: Callable[[], str]
+) -> None:
+    data_dir = tmp_path / "retire"
+    session = JumpingRopeSession(
+        data_dir, session_id="ret", config=JumpConfig.unbound(),
+        force_fallback=True, clock=clock,
+    )
+    session.record_event("open", "RFACT the walnut governor caps retries at nine",
+                         priority=2, densify=False)
+    for i in range(60):
+        session.record_event("decision", FAT_DECISION.format(n=i), reason="load")
+    assert count_tokens(session.rope.render()) > 2_000
+    jumps_before = session.rope.jump_count
+
+    artifact = session.retire(budget_tokens=600)
+
+    assert count_tokens(artifact) <= 600
+    assert session.meta.config.mode == "bound"
+    assert session.rope.jump_count == jumps_before + 1
+    assert int(session.store.stats()["records"]) > 0  # type: ignore[call-overload]
+    # Nothing lost: the demoted fact comes back from the vault.
+    assert "walnut" in session.retrieve("walnut governor caps retries")
+    session.close()
+
+    # The retirement persists: reopening stays bound at the new budget.
+    reopened = JumpingRopeSession(data_dir, force_fallback=True, clock=clock)
+    assert reopened.meta.config.mode == "bound"
+    assert reopened.meta.config.rope_budget_tokens == 600
+    reopened.close()
+
+
+def test_retire_rejects_unsatisfiable_budget(
+    tmp_path: Path, clock: Callable[[], str]
+) -> None:
+    session = JumpingRopeSession(
+        tmp_path / "r2", session_id="r2", config=JumpConfig.unbound(),
+        force_fallback=True, clock=clock,
+    )
+    import pytest
+
+    with pytest.raises(ValueError, match="minimum"):
+        session.retire(budget_tokens=100)
+    assert session.meta.config.mode == "unbound"  # unchanged on failure
+    session.close()
+
+
+def test_cli_retire(tmp_path: Path) -> None:
+    def jrope(args: list[str]) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            [sys.executable, "-m", "jumping_rope.cli", *args],
+            cwd=tmp_path, capture_output=True, text=True, check=False,
+        )
+
+    assert jrope(["init", "--mode", "unbound"]).returncode == 0
+    for i in range(40):
+        assert jrope(["log", "decision", FAT_DECISION.format(n=i),
+                      "--reason", "load"]).returncode == 0
+    result = jrope(["retire", "--budget", "600"])
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.startswith("# ROPE v1")
+    status = json.loads(jrope(["status"]).stdout)
+    assert status["mode"] == "bound"
+    assert status["rope_tokens"] <= 600

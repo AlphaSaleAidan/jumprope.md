@@ -87,6 +87,8 @@ def _full(args: argparse.Namespace) -> int:
                 print(f"{k}: {v}")
         elif args.command == "jump":
             sys.stdout.write(session.jump())
+        elif args.command == "retire":
+            sys.stdout.write(session.retire(budget_tokens=args.budget))
         elif args.command == "query":
             result = session.retrieve(args.text)
             print(result if result else "NO-HIT")
@@ -218,7 +220,7 @@ def _degraded(args: argparse.Namespace) -> int:
         body = rope_path.read_text(encoding="utf-8")
         print(f"mode: degraded (no TurboVec)\nrope: {rope_path}")
         print(f"est_tokens: {_est_tokens(body)}\nbudget: {budget}")
-    elif args.command == "jump":
+    elif args.command in ("jump", "retire"):
         m = re.match(r"^(# ROPE v1 \| sess:\S+ \| j:)(\d+)( \| t:)\S+$", header)
         if m:
             header = f"{m.group(1)}{int(m.group(2)) + 1}{m.group(3)}{_now()}"
@@ -264,6 +266,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_log.add_argument("--reason", default="")
     common(sub.add_parser("status"))
     common(sub.add_parser("jump"))
+    common(sub.add_parser("retire"))
     p_query = sub.add_parser("query")
     common(p_query)
     p_query.add_argument("text")

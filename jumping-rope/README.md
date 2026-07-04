@@ -78,6 +78,19 @@ pipe's `MODE` valve, or the proxy's `JROPE_MODE` env. The pipe and proxy
 default to **unbound** (streaming eviction); the Python API defaults to
 **bound** for backward compatibility.
 
+**Stack them.** The modes compose as lifecycle phases: work **unbound**
+while the session is hot (zero recall risk), then **retire** it when it
+goes cold —
+
+```bash
+jrope retire --budget 2000   # or session.retire(budget_tokens=2000)
+```
+
+— one explicit demotion pass moves everything over budget into TurboVec
+and emits the compact bound artifact; the session stays bound afterwards.
+Never automatic: surprise mid-flow compaction is exactly what unbound mode
+exists to avoid.
+
 When `## KEYS` itself grows past what the budget allows, the oldest stubs
 coalesce into a **keyring**: one TurboVec record bundling the stubs, replaced
 in the rope by a single digest stub `K{n}|KR:tok1,tok2,… [+n]|{key}` carrying
