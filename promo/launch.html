@@ -1,0 +1,209 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:100%; height:100%; overflow:hidden; background:#000;
+    display:flex; align-items:center; justify-content:center;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif; }
+  #stage { transform-origin:center center; flex:0 0 auto; position:relative;
+    width:1080px; height:1920px; background:
+    radial-gradient(1200px 900px at 50% 14%, #13203a 0%, #0B1220 58%); overflow:hidden; }
+  .scene { position:absolute; inset:0; opacity:0; }
+  .c-mint{color:#34D399}.c-amber{color:#F59E0B}.c-red{color:#EF4444}
+  .c-blue{color:#60A5FA}.c-mut{color:#93A4C3}.c-hi{color:#E7EEF9}
+  .center{position:absolute;left:50%;transform:translateX(-50%);text-align:center;width:960px}
+  .big{font-weight:800;line-height:1.02;letter-spacing:-.02em}
+  .grain{position:absolute;inset:0;pointer-events:none;opacity:.05;
+    background-image:repeating-linear-gradient(0deg,#fff 0 1px,transparent 1px 3px)}
+  /* lower third reserved for a creator's head & shoulders */
+  .creatorzone{position:absolute;left:0;bottom:0;width:1080px;height:600px;
+    background:linear-gradient(180deg,rgba(11,18,32,0) 0%,rgba(8,13,24,.55) 55%,rgba(6,10,20,.8) 100%)}
+  .chip{position:absolute;border-radius:12px;padding:11px 17px;font-size:25px;font-weight:600;
+    background:#16233d;border:1px solid #22314f;color:#cfe0ff;white-space:nowrap}
+  svg{position:absolute;left:0;top:0}
+  .card{position:absolute;border-radius:22px;background:linear-gradient(180deg,#12203a,#0e1a30);
+    border:1px solid #26365a;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  .klabel{position:absolute;font-size:22px;font-weight:700;letter-spacing:.02em}
+  .pill{position:absolute;border-radius:999px;padding:13px 28px;font-size:29px;font-weight:800}
+</style></head>
+<body>
+<div id="stage">
+  <!-- S1 HOOK -->
+  <div class="scene" id="s1">
+    <svg id="rope1" width="1080" height="1920"></svg>
+    <div class="center big" id="s1t1" style="top:470px;font-size:104px"></div>
+    <div class="center big" id="s1t2" style="top:610px;font-size:104px"></div>
+    <div class="center c-mut" id="s1t3" style="top:800px;font-size:40px;font-weight:600"></div>
+  </div>
+  <!-- S2 PROBLEM -->
+  <div class="scene" id="s2">
+    <div class="center c-hi big" id="s2h" style="top:150px;font-size:58px;width:920px"></div>
+    <div id="s2chat"></div>
+    <div class="center" id="s2cost" style="top:840px;font-size:140px;font-weight:800"></div>
+    <div class="center c-mut" id="s2costlab" style="top:1010px;font-size:33px;font-weight:600">tokens re-read, every turn</div>
+    <div class="center" id="s2words" style="top:1110px;font-size:44px;font-weight:800;letter-spacing:.03em"></div>
+  </div>
+  <!-- S3 SOLUTION -->
+  <div class="scene" id="s3">
+    <div class="center c-hi big" id="s3h" style="top:120px;font-size:64px"></div>
+    <div class="card" id="rope" style="left:130px;top:320px;width:820px;height:420px"></div>
+    <div class="klabel c-mint" id="ropelab" style="left:150px;top:280px">THE ROPE — one-page cheat sheet</div>
+    <div id="ropelines"></div>
+    <div class="card" id="vault" style="left:210px;top:840px;width:660px;height:230px"></div>
+    <div class="klabel c-blue" id="vaultlab" style="left:230px;top:800px">THE VAULT — searchable drawer</div>
+    <div class="center c-mut" id="s3sub" style="top:1140px;font-size:36px;font-weight:600;width:900px"></div>
+  </div>
+  <!-- S4 PROOF -->
+  <div class="scene" id="s4">
+    <div class="center c-hi big" id="s4h" style="top:110px;font-size:52px;width:960px"></div>
+    <div class="center c-amber" id="s4sub" style="top:220px;font-size:32px;font-weight:700"></div>
+    <svg id="chart" width="1080" height="720" style="top:280px"></svg>
+    <div class="pill" id="pillA" style="left:130px;top:1000px;background:#0f2e22;color:#34D399;border:1px solid #1f5a44">● address by name → 100%</div>
+    <div class="pill" id="pillB" style="left:130px;top:1095px;background:#3a1d0a;color:#F59E0B;border:1px solid #6b3a12">● search by meaning → coin&nbsp;flip</div>
+  </div>
+  <!-- S5 CTA -->
+  <div class="scene" id="s5">
+    <svg id="rope5" width="1080" height="1920"></svg>
+    <div class="center big c-hi" id="s5t1" style="top:470px;font-size:120px"></div>
+    <div class="center c-mint" id="s5t2" style="top:640px;font-size:44px;font-weight:700"></div>
+    <div class="center c-mut" id="s5t3" style="top:770px;font-size:38px;font-weight:600"></div>
+  </div>
+  <div class="creatorzone"></div>
+  <div class="grain"></div>
+</div>
+<script>
+const FPS=30;
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const eout=t=>1-Math.pow(1-t,3);
+const lerp=(a,b,t)=>a+(b-a)*t;
+function typed(el,txt,p){const n=Math.round(clamp(p,0,1)*txt.length);el.textContent=txt.slice(0,n);}
+function show(id,o){document.getElementById(id).style.opacity=o;}
+function fadeAll(){['s1','s2','s3','s4','s5'].forEach(s=>show(s,0));}
+
+const S={s1:[0,4.6],s2:[4.6,11.2],s3:[11.2,19.4],s4:[19.4,29.4],s5:[29.4,34.4]};
+function local(t,win){return clamp((t-win[0])/(win[1]-win[0]),0,1);}
+function active(t,win,fade=0.35){
+  if(t<win[0]||t>win[1])return 0;
+  const inp=clamp((t-win[0])/fade,0,1), outp=clamp((win[1]-t)/fade,0,1);
+  return Math.min(inp,outp);
+}
+function ropePath(svg,t,seed){
+  let d="";const H=1920;
+  for(let y=0;y<=H;y+=12){
+    const x=540+Math.sin(y/230+seed+t*0.7)*230+Math.sin(y/70-t*0.5)*30;
+    d+=(y===0?"M":"L")+x.toFixed(1)+" "+y+" ";
+  }
+  const grad=`<defs><linearGradient id="g${seed}" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#34D399" stop-opacity="0"/>
+    <stop offset="0.5" stop-color="#34D399" stop-opacity="0.9"/>
+    <stop offset="1" stop-color="#60A5FA" stop-opacity="0"/></linearGradient>
+    <filter id="b${seed}"><feGaussianBlur stdDeviation="6"/></filter></defs>`;
+  svg.innerHTML=grad+
+    `<path d="${d}" fill="none" stroke="url(#g${seed})" stroke-width="10" filter="url(#b${seed})" opacity="0.6"/>`+
+    `<path d="${d}" fill="none" stroke="#7CF0C2" stroke-width="2.5" opacity="0.9"/>`;
+}
+const CHAT=["ship the payments migration","use argon-4821 for the build",
+  "decided: basalt-queue for durability","API key rotates on friday",
+  "port 5173 for the dev server","the amber gasket is pinned"];
+
+function drawChart(p){
+  // compact chart: y100=90 (top) .. y0=560 (baseline)
+  const xs=[110,270,430,590,750,910], y0=560, y100=90;
+  const Y=v=>y0-(v/100)*(y0-y100);
+  const flat=[100,100,58,31,20,29], rope=[100,100,100,100,100,100], chance=[100,100,60,33,18,9];
+  let g="";
+  for(let v=0;v<=100;v+=20){g+=`<line x1="90" y1="${Y(v)}" x2="960" y2="${Y(v)}" stroke="#22314F" stroke-dasharray="3 6"/>
+    <text x="80" y="${Y(v)+6}" fill="#93A4C3" font-size="20" text-anchor="end">${v}%</text>`;}
+  const lbl=['0','2','4','8','16','32'];
+  xs.forEach((x,i)=>g+=`<text x="${x}" y="600" fill="#93A4C3" font-size="22" text-anchor="middle">${lbl[i]}</text>`);
+  g+=`<text x="525" y="642" fill="#93A4C3" font-size="23" text-anchor="middle">duplicate functions with the same name →</text>`;
+  const seg=p*5, upto=Math.floor(seg), fr=seg-upto;
+  function partial(arr){
+    let pts=[];for(let i=0;i<=Math.min(upto,5);i++)pts.push([xs[i],Y(arr[i])]);
+    if(upto<5){const x=lerp(xs[upto],xs[upto+1],fr),y=lerp(Y(arr[upto]),Y(arr[upto+1]),fr);pts.push([x,y]);}
+    return pts.map(q=>q[0].toFixed(0)+","+q[1].toFixed(0)).join(" ");
+  }
+  const full=arr=>arr.map((v,i)=>xs[i]+","+Y(v)).join(" ");
+  g+=`<polyline points="${full(chance)}" fill="none" stroke="#4B5F86" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6"/>`;
+  g+=`<polyline points="${partial(rope)}" fill="none" stroke="#34D399" stroke-width="6"/>`;
+  g+=`<polyline points="${partial(flat)}" fill="none" stroke="#F59E0B" stroke-width="5"/>`;
+  g+=`<circle cx="${xs[0]}" cy="${Y(100)}" r="6" fill="#34D399"/>`;
+  document.getElementById('chart').innerHTML=g;
+}
+
+function render(t){
+  fadeAll();
+  let a=active(t,S.s1); if(a>0){show('s1',a);const p=local(t,S.s1);
+    ropePath(document.getElementById('rope1'),t,1.0);
+    typed(document.getElementById('s1t1'),"Your AI has",eout(clamp(p*2.2,0,1)));
+    document.getElementById('s1t1').className="center big c-hi";
+    typed(document.getElementById('s1t2'),"no memory.",eout(clamp((p-0.25)*2.2,0,1)));
+    document.getElementById('s1t2').className="center big c-mint";
+    document.getElementById('s1t3').textContent = p>0.6?"here's the fix →":"";
+    document.getElementById('s1t3').style.opacity=clamp((p-0.6)*3,0,1);
+  }
+  a=active(t,S.s2); if(a>0){show('s2',a);const p=local(t,S.s2);
+    document.getElementById('s2h').textContent="Every message, it re-reads the ENTIRE chat.";
+    const chat=document.getElementById('s2chat');
+    if(chat.childElementCount===0){CHAT.forEach((c)=>{const d=document.createElement('div');
+      d.className="chip";d.textContent=c;chat.appendChild(d);});}
+    [...chat.children].forEach((d,i)=>{const app=clamp((p*6)-i*0.6,0,1);
+      d.style.left=(150+(i%2)*60)+"px"; d.style.top=(320+i*72)+"px";
+      d.style.opacity=app*0.9; d.style.transform=`translateY(${(1-eout(app))*26}px)`;});
+    const cost=Math.round(eout(clamp(p*1.4,0,1))*128000);
+    document.getElementById('s2cost').className="center c-red";
+    document.getElementById('s2cost').textContent=cost.toLocaleString();
+    const w=document.getElementById('s2words');
+    w.className="center c-mut"; w.style.opacity=clamp((p-0.7)*3,0,1);
+    w.innerHTML='<span class="c-red">slow.</span> <span class="c-amber">expensive.</span> <span class="c-red">forgetful.</span>';
+  }
+  a=active(t,S.s3); if(a>0){show('s3',a);const p=local(t,S.s3);
+    document.getElementById('s3h').innerHTML='Give it a <span class="c-mint">cheat sheet.</span>';
+    const rl=document.getElementById('ropelines');
+    if(rl.childElementCount===0){["STATE  ·  payments migration → shipping","GOALS  ·  ◌ box builder   ✓ checkout",
+      "DECIDE ·  basalt-queue (durability)","KEYS   ·  t42·argon-4821   t51·port 5173"].forEach((c,i)=>{
+      const d=document.createElement('div');d.className="klabel c-hi";
+      d.style.left="170px";d.style.top=(378+i*78)+"px";d.style.fontSize="26px";d.style.fontWeight="600";
+      d.dataset.txt=c;rl.appendChild(d);});}
+    [...rl.children].forEach((d,i)=>{const pp=clamp((p*5)-0.6-i*0.5,0,1);
+      typed(d,d.dataset.txt,pp);d.style.opacity=clamp(pp*2,0,1);});
+    const vp=clamp((p-0.55)*3,0,1);
+    document.getElementById('vault').style.opacity=vp;
+    document.getElementById('vaultlab').style.opacity=vp;
+    document.getElementById('s3sub').style.opacity=clamp((p-0.75)*4,0,1);
+    document.getElementById('s3sub').innerHTML='wipe the chat — <span class="c-mint">lose nothing.</span>';
+  }
+  a=active(t,S.s4); if(a>0){show('s4',a);const p=local(t,S.s4);
+    document.getElementById('s4h').innerHTML='Tested on <span class="c-mint">875,000 lines</span> of real code';
+    document.getElementById('s4sub').textContent="recall one specific function among its duplicates";
+    document.getElementById('s4sub').style.opacity=clamp(p*3,0,1);
+    // keys (legend) available immediately; chart finishes early → time to read
+    document.getElementById('pillA').style.opacity=clamp((p-0.04)*5,0,1);
+    document.getElementById('pillB').style.opacity=clamp((p-0.10)*5,0,1);
+    drawChart(clamp((p-0.14)*2.1,0,1));
+  }
+  a=active(t,S.s5); if(a>0){show('s5',a);const p=local(t,S.s5);
+    ropePath(document.getElementById('rope5'),t,3.0);
+    typed(document.getElementById('s5t1'),"Jumping Rope",eout(clamp(p*2,0,1)));
+    document.getElementById('s5t2').textContent="open source";
+    document.getElementById('s5t2').style.opacity=clamp((p-0.4)*3,0,1);
+    document.getElementById('s5t3').textContent="link in bio ↑";
+    document.getElementById('s5t3').style.opacity=clamp((p-0.6)*3,0,1);
+  }
+}
+window.setFrame=(i)=>render(i/FPS);
+window.render=render; render(0);
+
+const DURATION=34.4;
+function fit(){const s=Math.min(innerWidth/1080,innerHeight/1920);
+  document.getElementById('stage').style.transform=`scale(${s})`;}
+addEventListener('resize',fit); fit();
+const EXPORT=new URLSearchParams(location.search).has('export');
+if(!EXPORT){
+  let start=null;
+  function loop(now){ if(start===null)start=now;
+    const t=((now-start)/1000)%DURATION; render(t); requestAnimationFrame(loop); }
+  requestAnimationFrame(loop);
+  addEventListener('click',()=>{start=null;});
+}
+</script>
+</body></html>

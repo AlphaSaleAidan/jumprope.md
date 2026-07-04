@@ -1,0 +1,53 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:1080px;height:1350px;overflow:hidden;font-family:'Impact','Arial Black',sans-serif}
+#m{position:relative;width:1080px;height:1350px;background:#1a1712;
+  background-image:radial-gradient(circle at 20% 30%,#241f18 0,#141210 70%)}
+.tape{position:absolute;background:rgba(220,210,180,.15);border:1px dashed rgba(255,255,255,.15)}
+.card{position:absolute;background:#f3ead0;color:#141210;font-family:'Courier New',monospace;
+  font-weight:700;font-size:26px;padding:14px 18px;border-radius:3px;
+  box-shadow:0 8px 18px rgba(0,0,0,.5);transform-origin:center}
+.pin{position:absolute;width:16px;height:16px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#ff8a8a,#c0202a);box-shadow:0 2px 4px rgba(0,0,0,.6)}
+svg{position:absolute;left:0;top:0}
+.cap{position:absolute;left:0;width:1080px;text-align:center;color:#fff;
+  text-transform:uppercase;letter-spacing:.01em;line-height:1.05;
+  text-shadow:0 4px 12px rgba(0,0,0,.9),0 0 3px #000;font-family:'Arial Black',sans-serif}
+.face{position:absolute;font-size:150px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.6))}
+.wm{position:absolute;bottom:26px;left:0;width:1080px;text-align:center;color:#8a7f6a;
+  font-family:Arial;font-size:24px;letter-spacing:.2em;font-weight:700}
+</style></head><body><div id="m">
+<div class="cap" style="top:40px;font-size:56px">SEMANTIC SEARCH TRYING TO FIND</div>
+<div class="cap c" style="top:104px;font-size:56px;color:#ffd94d">THE ONE <span style="font-family:'Courier New',monospace">close()</span> YOU MEANT</div>
+<svg id="str" width="1080" height="1350"></svg>
+<div id="board"></div>
+<div class="face" style="left:40px;top:1120px;font-size:120px">🤪</div>
+<div class="cap" style="top:1150px;font-size:44px;padding-left:150px">they're all named the same, chief</div>
+<div class="wm">JUMPROPE.MD · ADDRESS IT, DON'T SEARCH IT</div>
+</div>
+<script>
+// seeded layout so every render is identical
+let s=12345; const rnd=()=>{s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff;};
+const labels=["close()","close()","close()","read()","close()","run()","close()","read()",
+  "close()","__init__","close()","run()","close()","close()","read()","close()","run()","close()"];
+const board=document.getElementById('board'), str=document.getElementById('str');
+const pts=[];
+labels.forEach((lab,i)=>{
+  const x=120+rnd()*760, y=270+rnd()*640, rot=(rnd()*20-10);
+  const c=document.createElement('div'); c.className='card'; c.textContent=lab;
+  c.style.left=x+'px'; c.style.top=y+'px'; c.style.transform='rotate('+rot+'deg)';
+  if(lab==='close()'){c.style.background='#fff3c4';}
+  board.appendChild(c);
+  const p=document.createElement('div'); p.className='pin'; p.style.left=(x+30)+'px'; p.style.top=(y-6)+'px';
+  board.appendChild(p);
+  pts.push([x+40,y+18]);
+});
+// chaotic red string between the close() cards
+let g='';
+const closeIdx=labels.map((l,i)=>l==='close()'?i:-1).filter(i=>i>=0);
+for(let i=0;i<closeIdx.length;i++){
+  const a=pts[closeIdx[i]], b=pts[closeIdx[(i*7+3)%closeIdx.length]];
+  g+=`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="#d1202a" stroke-width="3" opacity="0.85"/>`;
+}
+str.innerHTML=g;
+</script></body></html>
