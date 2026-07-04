@@ -157,3 +157,28 @@ fixed budget that caps how many facts get a handle. The win is not "free recall,
 it's "recall you can *buy* one line at a time, immune to store size." Shipped
 `tests/test_theory_t7.py` (marked `local`) + `research/exp_t7_distractors.py` +
 `assets/chart-distractors.svg`.
+
+### Entry 8 — T5 MEASURED NULL: no lost-in-the-middle up to 21k (single needle, Haiku) (2026-07-04)
+The scripted reader is position-invariant, so T5 needs a live model. Bounded FREE
+sweep (local `claude -p --model haiku`, no Meridian): one needle placed at depth
+5% / 50% / 95% across three context sizes, 8 targets each.
+
+| context (tokens) | depth 5% | depth 50% | depth 95% |
+|---|---|---|---|
+| small (~547) | 100% | 100% | 100% |
+| large (~5,669) | 100% | 100% | 100% |
+| xlarge (~21,417) | 100% | 100% | 100% |
+
+**72/72 recalled.** No middle-of-context recall valley even at 21k tokens. This
+is recorded as an honest **null**, not forced into a "confirmed": for a single
+exact-match needle at rope-relevant scales, a modern model shows no positional
+weakness to exploit. It matters because it *rules out* a tempting story — the
+rope does NOT win by dodging lost-in-the-middle. Its edge is cost (T1/T4) and
+noise-robustness (T8/T7). Position is simply not the axis.
+
+Caveat (why the null is scoped, not universal): single-needle exact recall is the
+*easy* form of the effect. Classic LITM bites hardest with many competing needles,
+much longer contexts (30k–100k+), and answers requiring reasoning across position
+— untested here and out of scope for a free CLI sweep. Shipped `test_theory_t5.py`
+(pins the artifact so the null can't rot) + `research/exp_t5_ordering.py` +
+`results/t5-ordering/`.

@@ -22,6 +22,7 @@ Regenerate CI-tier rows from a fresh clone with the commands in
 | C13 | **T8** — rope is noise-robust: acc at 16× filler vs lossy baselines | rope 44% vs truncate/summary 16% | 3 seeds | rope−truncate margin 7pt→28pt as filler grows | `tests/test_theory_t8.py` | `pytest -m local tests/test_theory_t8.py` |
 | C14 | **T7** — flat semantic recall of a specific fact collapses under near-duplicates | 100%→0% (N=0→64); rope exact-fetch 100% throughout | 8 seeds × 20 targets | tracks/undershoots chance k/(N+1) | `tests/test_theory_t7.py`, `research/exp_t7_distractors.py` | `pytest -m local tests/test_theory_t7.py` |
 | C15 | **T7** — AI-native coding makes semantic search fail *faster* (widens exact-vs-semantic gap) | flat 48%→33% at N=4 (symbolic→ai-native); rope 100% both | 8 seeds × 20 targets | — | same | same |
+| C16 | **T5** — no lost-in-the-middle for a single needle up to 21k tok (live Haiku) | 72/72 recalled at depth 5/50/95% | 8 targets × 3 depths × 3 sizes | honest NULL — position isn't the rope's edge | `tests/test_theory_t5.py`, `results/t5-ordering/` | `pytest tests/test_theory_t5.py` |
 
 ## Corrected claims (correction history, kept visible)
 

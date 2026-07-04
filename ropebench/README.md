@@ -128,6 +128,11 @@ sub-theories of the core claim. Confirmed so far (each with a regression test in
   conversational filler grows, lossy baselines collapse (truncate/summary 16% at
   16× filler) while the rope degrades gracefully (44%); the rope−truncate margin
   grows 7pt→28pt.
+- **T5 — a measured null (kept honest).** Live Haiku recalled a single needle
+  72/72 at depth 5/50/95% across 547→21,417-token contexts — **no
+  lost-in-the-middle** at these scales. Recorded as a null, not spun: it *rules
+  out* the story that the rope wins by dodging positional weakness. It doesn't;
+  it wins on cost (T1/T4) and noise (T7/T8).
 
 The statistics themselves are validated: over 100k simulated experiments the
 bootstrap 95% CI covers the true value ~95% of the time.
