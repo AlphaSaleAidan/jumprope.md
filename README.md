@@ -250,4 +250,6 @@ Agents working in this repo get project skills from
 Development plan (what's next, known limits, the live-model phase):
 [`ropebench/ROADMAP.md`](ropebench/ROADMAP.md). Imported with full git
 history from [jumping-rope](https://github.com/AlphaSaleAidan/jumping-rope)
-and [ropebench](https://github.com/AlphaSaleAidan/ropebench). MIT.
+and [ropebench](https://github.com/AlphaSaleAidan/ropebench) — both fully
+merged to `main` (build, two adversarial campaigns, v1.1 modes, benchmark).
+MIT.
