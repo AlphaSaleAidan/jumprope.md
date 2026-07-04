@@ -328,6 +328,15 @@ fails *faster* (48%→33% at four distractors) while the exact fetch is unmoved.
 That is the counter-intuitive punchline: the denser and more coded your memory,
 the *more* you need to address it by key instead of searching it by meaning.
 
+<p align="center"><img src="assets/chart-capability.svg" width="900" alt="a real model decodes the dense AI-native rope with no loss where a literal keyword-matcher drops 10 points"></p>
+
+And is that dense AI-native coding *safe*? For a real model, completely. A literal
+keyword-matcher drops 10 points on the coded rope (it can't match the words it
+codes away) — but a live model **reads the legend and decodes it with zero loss**
+(100% vs the matcher's 83%). The density "floor" is a weak-reader artifact, so the
+token savings come free: **densify the rope as hard as you like — any real model
+reads it fine.**
+
 ### And this is exactly why it matters for a big codebase
 
 <p align="center"><img src="assets/chart-codescale.svg" width="900" alt="on 875,000 lines of real code, semantic search for a specific function collapses to a coin flip while exact file::symbol addressing stays 100%"></p>

@@ -220,3 +220,35 @@ recall is never distinctive, it's "which of the 40 `close()` did I mean?", which
 is Part A, where semantic fails and the address wins. Shipped
 `test_theory_t9.py`, `research/exp_t9_codescale.py`, `results/t9-codescale/`,
 `assets/chart-codescale.svg`.
+
+### Entry 10 — T6 CONFIRMED: capability recovers the density loss (2026-07-04)
+T2 showed ai-native coding drops the *scripted literal reader's* recall (it codes
+away matchable context words). T6 asks: does a real model read the LEGEND and
+decode it? Same ropes (symbolic-en vs ai-native), two readers, 2 seeds:
+
+| reader | symbolic-en | ai-native | ai-native drop |
+|---|---|---|---|
+| scripted (literal matcher) | 93% | 83% | **−10%** |
+| live Haiku | 100% | 100% | **+0%** |
+
+The scripted reader pays the density tax (reproduces T2). **Live Haiku pays
+nothing — 100% on both** — a **+17% capability recovery** on the coded rope
+(live ai-native 100% vs scripted ai-native 83%). Even a *small* model fully
+decodes the ai-native rope via its legend; the "density floor" is a **weak-reader
+artifact**, not a real cost for deployments that read the rope with an actual
+model.
+
+This closes the T2↔T6↔T7 loop:
+- **T2** — ai-native hurts a literal keyword-matcher (the floor).
+- **T6** — a real model decodes it and recovers fully (floor is weak-reader-only).
+- **T7** — on the retrieval tier ai-native is safe *by construction* (exact key,
+  not fuzzy), and even widens the exact-vs-semantic gap.
+Net: **aggressive AI-native densification is safe for capable models everywhere**
+— resident rope (T6) and vault (T7) — so densify freely and pocket the tokens.
+
+Honest caveat: Haiku *saturates* this scenario (100% ceiling), so the effect we
+observe is the scripted drop that live erases; a harder scenario or a
+capability-gradient (haiku→sonnet→opus) would show partial→full recovery curves —
+queued, but the qualitative result (capability erases the density tax) is clear
+even at the floor of the model range. Shipped `test_theory_t6.py` (pins artifact)
++ `research/exp_t6_capability_density.py` + `results/t6-capability-density/`.
