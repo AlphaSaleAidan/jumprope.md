@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 470" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
+<rect width="920" height="470" rx="18" fill="#0B1220"/>
+<text x="70" y="44" fill="#E7EEF9" font-size="21" font-weight="700">On 875,000 lines of real code, "search by meaning" becomes a coin flip</text>
+<text x="70" y="70" fill="#93A4C3" font-size="14">Recalling ONE specific function when the codebase has N others with the same name · Python 3.12 stdlib</text>
+<line x1="70" y1="406" x2="760" y2="406" stroke="#22314F"/>
+<text x="62" y="410" fill="#93A4C3" font-size="11" text-anchor="end">0%</text>
+<line x1="70" y1="349" x2="760" y2="349" stroke="#22314F" stroke-dasharray="3 5"/>
+<text x="62" y="353" fill="#93A4C3" font-size="11" text-anchor="end">20%</text>
+<line x1="70" y1="292" x2="760" y2="292" stroke="#22314F" stroke-dasharray="3 5"/>
+<text x="62" y="296" fill="#93A4C3" font-size="11" text-anchor="end">40%</text>
+<line x1="70" y1="234" x2="760" y2="234" stroke="#22314F" stroke-dasharray="3 5"/>
+<text x="62" y="238" fill="#93A4C3" font-size="11" text-anchor="end">60%</text>
+<line x1="70" y1="177" x2="760" y2="177" stroke="#22314F" stroke-dasharray="3 5"/>
+<text x="62" y="181" fill="#93A4C3" font-size="11" text-anchor="end">80%</text>
+<line x1="70" y1="120" x2="760" y2="120" stroke="#22314F" stroke-dasharray="3 5"/>
+<text x="62" y="124" fill="#93A4C3" font-size="11" text-anchor="end">100%</text>
+<text x="70" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">0</text>
+<text x="208" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">2</text>
+<text x="346" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">4</text>
+<text x="484" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">8</text>
+<text x="622" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">16</text>
+<text x="760" y="428" fill="#93A4C3" font-size="12" text-anchor="middle">32</text>
+<text x="415" y="450" fill="#93A4C3" font-size="12" text-anchor="middle">other functions in the codebase with the SAME name (N)</text>
+<!-- chance line k/(N+1): 100,100,60,33,18,9 -->
+<polyline points="70,120 208,120 346,234 484,312 622,354 760,380" fill="none" stroke="#4B5F86" stroke-width="1.5" stroke-dasharray="4 4"/>
+<text x="655" y="374" fill="#6B7EA6" font-size="11">chance (coin flip)</text>
+<!-- rope exact: flat 100% -->
+<polyline points="70,120 208,120 346,120 484,120 622,120 760,120" fill="none" stroke="#34D399" stroke-width="4"/>
+<circle cx="70" cy="120" r="4" fill="#34D399"/><circle cx="346" cy="120" r="4" fill="#34D399"/><circle cx="622" cy="120" r="4" fill="#34D399"/>
+<text x="330" y="112" fill="#34D399" font-size="13" font-weight="700">rope — exact file::symbol address · 100%</text>
+<!-- flat semantic on real code: 100,100,58,31,20,29 (y = 406-pct*2.86) -->
+<polyline points="70,120 208,120 346,240 484,317 622,349 760,323" fill="none" stroke="#F59E0B" stroke-width="3"/>
+<circle cx="346" cy="240" r="3.5" fill="#F59E0B"/><circle cx="484" cy="317" r="3.5" fill="#F59E0B"/><circle cx="622" cy="349" r="3.5" fill="#F59E0B"/><circle cx="760" cy="323" r="3.5" fill="#F59E0B"/>
+<text x="380" y="235" fill="#F59E0B" font-size="12" font-weight="600">semantic search on real code (tracks the coin flip)</text>
+<text x="70" y="464" fill="#6B7EA6" font-size="11">~1,000,000 tokens of code — fits in no context window. You can't carry it; you must address it. Exact key wins by construction.</text>
+</svg>

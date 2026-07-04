@@ -28,6 +28,7 @@ Every clause below is measured, with a 95% CI, reproducible from a fresh clone.
 | T6 | Model capability × retrieval — stronger models exploit the vault more | *partially observed* | live Haiku narrows the literal reader's −6.7% gap to −4.0%; frontier tiers all show rope as best acc/token |
 | **T7** | Exact addressing survives distractors that sink semantic search | **CONFIRMED** | flat semantic recall of a specific fact 100%→0% as near-duplicates grow (N=0→64); rope's turn-stamped KEYS exact-fetch stays 100%; AI-native coding makes semantic fail *faster* (48%→33% at N=4), widening the gap |
 | **T8** | The rope is noise-robust; its margin over lossy baselines widens with filler | **CONFIRMED** | at 16× conversational filler, rope 44% vs truncate/summary 16%; rope−truncate margin 7pt→28pt as filler grows |
+| **T9** | T7 holds on a real large codebase (exact addressing beats semantic among near-duplicate symbols) | **CONFIRMED** | Python 3.12 stdlib (~1.03M tok, doesn't fit any window): semantic recall of a specific same-named function tracks coin-flip (58%→20%), exact file::symbol 100%; no LITM for a distinctive marker at 80k (12/12) |
 
 ## What the confirmed sub-theories add up to
 
