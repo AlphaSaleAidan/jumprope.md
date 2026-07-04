@@ -11,6 +11,7 @@ from pathlib import Path
 
 from .convert import from_claude_code, write_bench_jsonl
 from .models import CommandModel, OpenAICompatModel, ScriptedModel
+from .pricing import enforce_budget, estimate_cost
 from .regimes import default_regimes
 from .report import csv_rows, markdown, report_card, report_json
 from .runner import RegimeMetrics, run_scenario
@@ -100,6 +101,22 @@ def main(argv: list[str] | None = None) -> int:
     if model is None:
         return 2
     only = _conditions(args.conditions)
+
+    # S0: paid (--mode live) sweeps must pass a budget preflight. A free
+    # scripted dry-run of the same shape gives exact payload token counts.
+    if args.mode == "live" and not args.transcript:
+        from .pricing import BudgetExceeded
+        dry = run_scenario(
+            generate(1, n_turns=args.turns, chatty=args.chatty),
+            default_regimes(only=only), ScriptedModel(),
+        )
+        input_tok = sum(m.probe_tokens for m in dry.values()) * args.runs
+        calls = sum(len(m.probe_results) for m in dry.values()) * args.runs
+        try:
+            enforce_budget(estimate_cost(args.model, input_tok, calls))
+        except BudgetExceeded as exc:
+            print(f"aborted: {exc}")
+            return 3
     model_label = args.model if args.mode != "scripted" else "scripted"
 
     if args.transcript:

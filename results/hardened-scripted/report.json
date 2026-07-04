@@ -1,0 +1,86 @@
+{
+  "model": "scripted",
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "n_turns": 80,
+  "conditions": {
+    "full-history": {
+      "accuracy": 1.0,
+      "total_tokens": 511489,
+      "efficiency": 1.955,
+      "retrieval_rate": 0.0,
+      "n_probes": 150
+    },
+    "truncate": {
+      "accuracy": 0.86,
+      "total_tokens": 354756,
+      "efficiency": 2.424,
+      "retrieval_rate": 0.0,
+      "n_probes": 150
+    },
+    "summary": {
+      "accuracy": 0.7067,
+      "total_tokens": 335994,
+      "efficiency": 2.103,
+      "retrieval_rate": 0.0,
+      "n_probes": 150
+    },
+    "rope": {
+      "accuracy": 0.9333,
+      "total_tokens": 255381,
+      "efficiency": 3.655,
+      "retrieval_rate": 0.5267,
+      "n_probes": 150
+    },
+    "rope-unbound": {
+      "accuracy": 1.0,
+      "total_tokens": 898294,
+      "efficiency": 1.113,
+      "retrieval_rate": 0.0,
+      "n_probes": 150
+    }
+  },
+  "paired": {
+    "rope_vs_full-history": {
+      "n": 150,
+      "diff": -0.0667,
+      "ci_low": -0.1067,
+      "ci_high": -0.0267,
+      "verdict": "A-worse",
+      "wins": 0,
+      "losses": 10
+    },
+    "rope_vs_truncate": {
+      "n": 150,
+      "diff": 0.0733,
+      "ci_low": 0.0067,
+      "ci_high": 0.1467,
+      "verdict": "A-better",
+      "wins": 20,
+      "losses": 9
+    },
+    "rope_vs_summary": {
+      "n": 150,
+      "diff": 0.2267,
+      "ci_low": 0.1467,
+      "ci_high": 0.3067,
+      "verdict": "A-better",
+      "wins": 40,
+      "losses": 6
+    },
+    "rope_vs_rope-unbound": {
+      "n": 150,
+      "diff": -0.0667,
+      "ci_low": -0.1067,
+      "ci_high": -0.0267,
+      "verdict": "A-worse",
+      "wins": 0,
+      "losses": 10
+    }
+  }
+}

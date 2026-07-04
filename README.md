@@ -1,162 +1,126 @@
 # RopeBench
 
-**Effectiveness benchmark for LLM context-handoff strategies.** Measures a
-context-management *policy* with the model held constant — the inversion
-normal benchmarks can't do.
+**Measure what your agent's memory strategy actually costs you — on your own
+sessions, your own models, in one command.**
 
-[Jumping Rope](https://github.com/AlphaSaleAidan/jumping-rope) claims that a
-token-dense rope file plus a vector overflow store preserves session state at
-a fraction of the cost of replaying the transcript. RopeBench tests that
-claim against the real alternatives, on the axes normal benchmarks don't
-have.
+Long agent sessions overflow the context window, and every framework has a
+policy for what to do about it. RopeBench measures those policies head-to-head
+with the model held constant: same session, same probes, different memory
+strategy. Every number below traces to a row in [CLAIMS.md](CLAIMS.md) with its
+sample size and 95% CI; reproduce them with [REPRODUCE.md](REPRODUCE.md).
 
-## How this differs from normal benchmarks
+```bash
+pip install -e ".[dev]"
 
-| Normal benchmark | RopeBench |
-|---|---|
-| varies the model, fixes the context | fixes the model, varies the **context regime** |
-| one-shot, stateless tasks | longitudinal: probes planted at distances measured in **turns and compactions survived** |
-| scores answer accuracy | scores **state continuity**: fact retention by distance, decision recall, goal status, retrieval discipline |
-| ignores cost | cost is a first-class axis: the output is a **Pareto row** (accuracy per 10k tokens) |
-| absolute scores | deltas against matched baselines: full history (oracle), truncate-oldest, summary compaction |
-| fixed answers or LLM judges | synthetic scenarios with **owned ground truth** — scoring is substring matching, no judge noise |
+# measure your own Claude Code session
+jrope-bench convert my-session.jsonl bench.jsonl
+jrope-bench run --transcript bench.jsonl --conditions rope,carry,summarize --out out/
+cat out/report_card.md          # headline + paired CIs + verdicts
+# out/report.json is what you post to prove a reproduction
+```
 
-## The four regimes
+The strategies compared (the "conditions"): **carry** (full history — the
+oracle, and the cost worst case), **truncate** (drop oldest), **summarize**
+(what most frameworks do by default), **rope** (a real
+[Jumping Rope](https://github.com/AlphaSaleAidan/jumping-rope) session — the
+reference implementation), and **rope-unbound / streaming**.
 
-Same seeded event stream (facts, decisions, goal transitions, filler churn),
-four context policies:
+---
 
-1. **full-history** — carry everything; the oracle ceiling and the cost worst case
-2. **truncate** — drop-oldest under a token budget
-3. **summary** — deterministic stand-in for auto-compaction: old lines
-   collapse to their first words, then drop (loses trailing detail, exactly
-   like real summarization)
-4. **rope** — a real `JumpingRopeSession`: hard-budget rope + TurboVec
-   retrieval tool
+## Finding 1 (the lead): auto-summarization silently destroys OLD facts
 
-Two modes:
+Auto-summarization is the industry default. It is also the worst performer on
+exactly the thing you ask about later. Scored by **fact age** (when a fact was
+introduced), scripted reader, 5 seeds:
 
-- **scripted** (CI, zero network): a deterministic literal reader answers
-  probes from whatever the regime shows it — measures **information
-  availability**, the necessary condition.
-- **live**: any OpenAI-compatible model answers instead — measures
-  **information use** (including hallucinated continuity and whether the
-  model actually issues `RETRIEVE:` on cache misses).
-
-## Measured results (scripted mode, 3 seeds × 80 turns, 78 probes)
-
-| Regime | Acc | short | medium | long | fact | decision | status | retrieval | tokens | acc/10k tok |
-|---|---|---|---|---|---|---|---|---|---|---|
-| full-history | 100% | 100% | 100% | 100% | 100% | 100% | 100% | 0% | 280,455 | 3.6 |
-| truncate | 91% | 100% | 100% | 67% | 92% | 88% | 94% | 0% | 201,517 | 4.5 |
-| summary | 79% | 100% | 100% | 24% | 75% | 75% | 94% | 0% | 192,357 | 4.1 |
-| **rope (bound)** | **95%** | 100% | 87% | **100%** | 100% | 83% | 100% | 51% | **148,607** | **6.4** |
-| rope-unbound | 100% | 100% | 100% | 100% | 100% | 100% | 100% | 0% | 498,828 | 2.0 |
-
-The story: at long distance — the regime a context strategy exists for —
-bound rope holds **100%** while truncation falls to 67% and summary
-compaction to 24%, at ~half the oracle's token spend and the best
-accuracy-per-token of the field. **Unbound rope matches the oracle on every
-cell** (perfect verbatim recall, zero retrievals) — and the honest cost
-number is that on this *pre-distilled* event stream it costs MORE than the
-oracle (per-record structure + legend overhead; every decision line carries
-a full ISO date). Unbound's economics win against real chat transcripts —
-17–18% payloads measured in the adapter tests — which this event-driven
-scenario does not model. Findings B1–B5 in `ROADMAP.md`.
-
-## Live results (real model in the loop)
-
-Same harness, Haiku 4.5 answering instead of the scripted reader
-(3 seeds × 80 turns, 390 probe calls via `--mode live-cmd --cmd
-"claude -p --model haiku"`; raw output in `results/live-haiku-full/`):
-
-| Regime | Acc | short | medium | long | fact | decision | status | retrieval | tokens | acc/10k tok |
-|---|---|---|---|---|---|---|---|---|---|---|
-| full-history | 100% | 100% | 100% | 100% | 100% | 100% | 100% | 0% | 280,455 | 3.6 |
-| truncate | 88% | 100% | 100% | 57% | 92% | 88% | 83% | 0% | 201,517 | 4.4 |
-| summary | 77% | 100% | 100% | 14% | 75% | 75% | 83% | 0% | 192,357 | 4.0 |
-| **rope (bound)** | **100%** | 100% | 100% | **100%** | 100% | 100% | 100% | 56% | **150,560** | **6.6** |
-| rope-unbound | 100% | 100% | 100% | 100% | 100% | 100% | 100% | 0% | 498,828 | 2.0 |
-
-Three findings:
-
-1. **A real model on the bound rope is indistinguishable from the same
-   model on the full transcript** — 100% vs 100%, at 54% of the tokens.
-   The live model *beat* the scripted reader (95%): where the literal
-   reader's lexical matching missed, Haiku composed better `RETRIEVE:`
-   queries and recovered the fact. Retrieval was load-bearing on 56% of
-   probes; every answer contained the ground-truth value (0 hallucinated
-   answers on probed facts).
-2. **The lossy baselines are worse live than scripted.** Auto-summarize
-   fell to 14% on long-distance facts (scripted: 24%) — a real model
-   cannot reconstruct what summarization destroyed, and unlike the
-   scripted reader it does not get lucky on mangled fragments.
-3. **Unbound stays perfect live** (100%, zero retrievals) with the same
-   honest cost profile as scripted (see B4/B5).
-
-## Frontier models
-
-The strategy is not a small-model artifact. Same benchmark (1 seed × 60 turns,
-matched config) across three tiers, `results/frontier-*/`:
-
-| Model | carry-all acc | **rope acc** | rope acc/10k | oracle acc/10k | summary long-dist |
+| fact age | n | summary recall | rope recall | difference | 95% CI |
 |---|---|---|---|---|---|
-| Haiku 4.5 | 100% | 100% | **24.6** | 15.2 | 14% |
-| Sonnet 4.6 | 100% | 92% | **23.1** | 15.2 | 14% |
-| Opus 4.8 | 92% | **96%** | **22.8** | 14.0 | 0% |
+| **early** (oldest) | 65 | 74% | 94% | **−20.0%** | [−32.3%, −7.7%] |
+| **mid** | 70 | 61% | 91% | **−30.0%** | [−42.9%, −17.1%] |
+| **late** (recent) | 15 | 100% | 100% | +0.0% | [0%, 0%] |
 
-Bound rope has the best accuracy-per-token on every model (~1.6× the oracle).
-The headline is Opus: **the rope *beat* carry-everything (96% vs 92%)** — a
-strong model reasons better over a dense focused ledger than over a noisy full
-transcript, so compression is not just cheaper here, it is more accurate.
-Summary-compaction collapses on old facts across all three tiers.
+The damage is real and significant (both CIs clear zero) and it is
+**concentrated in old facts** — recent facts are untouched. This is the effect
+you feel when a long agent session "forgets" a decision from an hour ago: the
+summary ate the specifics. Large effect, survives the sample size. `CLAIMS.md`
+C1–C3.
 
-## Real Claude Code session (Phase 5)
+## Finding 2: on a long-enough session there is no "carry everything"
 
-`ropebench replay <session.jsonl>` mines cloze probes from a real session's own
-recurring distinctive values (ports, flags, PR#, hashes, versions) — owned
-ground truth, no LLM judge. On a real 117-turn session:
+A real 117-turn Claude Code session is **1.35M tokens** — it does not fit in
+any model's context window. The rope carries the same session in **~75K tokens
+(18× smaller)** and fits. Past a point, "carry everything" is not a baseline
+you can lose to; it is not an option at all, and the only real competition is
+summarize-vs-rope — which summarize loses (Finding 1). `CLAIMS.md` C10–C11.
 
-| Regime | Acc | tokens | acc/10k |
-|---|---|---|---|
-| full-history | 43–57% | **1,348,358** | 0.3–0.4 |
-| truncate | 0–71% | 49,943 | 0–14 |
-| summary | 0–43% | 50,775 | 0–8 |
-| **rope (bound)** | 43% | **74–77K** | **5.6–5.8** |
-| rope-unbound | 29–71% | 1,326,736 | 0.2–0.5 |
+## Finding 3: the quality claim, at exactly the strength the CI supports
 
-Decisive real-world finding: **the full transcript is 1.35M tokens — it does
-not fit in any model's context window**, while the rope carries the same
-session in ~75K (**18× smaller**) and fits. With only 7 auto-mined probes the
-accuracy figures are small-sample (ranges show scripted vs live), but the cost
-gap is unambiguous, and a live model on 1.35M raw tokens scored *worse* (43%)
-than the same model on the rope — big contexts degrade, dense ledgers don't.
+Does the rope match carrying the full transcript on accuracy? **It depends on
+who's reading**, and we report both honestly:
+
+- **Literal reader (scripted, n=150):** rope **trails** full-history by 6.7%
+  (95% CI [−10.7%, −2.7%] — significant). A keyword-matcher does not exploit
+  the retrieval tool well. `CLAIMS.md` C6.
+- **Real model (live, information-use):** the gap closes or reverses — a model
+  writes good vault queries where a matcher can't. Earlier live runs put rope
+  at parity with the oracle; a multi-seed hardened rerun is in flight
+  (`CLAIMS.md` C7).
+
+What is **not** claimed: the single-seed Opus "rope beats carry-all 96 vs 92"
+result (n=26) is directional only — its CI is not established, so it is not a
+headline. It is consistent with the long-context degradation literature, and a
+multi-seed frontier run is required before it becomes a claim.
+
+What **is** robust regardless: the rope beats summarize decisively (+22.7%,
+CI [+14.7%, +30.7%], n=150) and truncate (+7.3%, CI [+0.7%, +14.7%]) while
+spending far fewer tokens — the best accuracy-per-token of the field.
+
+## Finding 4 (B6 closed): unbound mode's economics, modeled in-bench
+
+Unbound mode's cost mechanism is **streaming eviction** — the transcript is
+dropped as it's captured. Earlier this rested on adapter tests; it is now
+modeled in the bench with the *real* `apply_streaming_policy` (no
+reimplementation). Result: streaming cost is **~flat as the transcript gets
+chattier** while full-history explodes. At 4× conversational padding, streaming
+is **29% of full-history**; on a filler-free stream it *loses* (nothing to
+evict) — reported honestly, not hidden. `CLAIMS.md` C8, `tests/test_b6.py`.
+
+---
+
+## How it works
+
+Same seeded session stream through each condition; probes with **owned ground
+truth** (planted values, or auto-mined distinctive tokens from a real
+transcript) scored by exact match — **no LLM judge**. Conditions are compared
+on the **same probes**, so differences get a **paired bootstrap 95% CI**
+(`ropebench/stats.py`, 10k resamples, seeded); a claim is written as
+*superiority* only when the CI clears zero, else as *parity* (which, at a
+fraction of the tokens, is itself a win).
+
+Two reader modes: **scripted** (deterministic, hermetic, free — measures
+*information availability*) and **live** (any OpenAI-compatible model or CLI —
+measures *information use*).
+
+## Cost safety (paid runs)
+
+Live sweeps refuse to start without `JROPE_BENCH_BUDGET_USD`, print a
+token-based cost estimate first, abort if over budget, and cache every
+`(model, payload)` response under `bench_cache/` so reruns and re-grading are
+free. Test tiers are marker-gated: `default` (CI, hermetic), `local`, `api`.
 
 ## Run it
 
 ```bash
-pip install -e ".[dev]"          # pulls jumping-rope from its repo
-pytest -q                        # 25 tests, zero network
+# hermetic, free — reproduces Findings 1, 3, 4
+jrope-bench run --runs 5 --turns 80 --out results/hardened-scripted
+pytest -q && ruff check . && mypy --strict ropebench
 
-# deterministic sweep (CI mode)
-ropebench run --mode scripted --seeds 3 --turns 80 --out results/
-
-# live sweep against any OpenAI-compatible endpoint
-ropebench run --mode live --seeds 3 \
-  --base-url https://openrouter.ai/api/v1 --model deepseek/deepseek-chat \
-  --api-key $KEY --out results/live/
+# your own model (paid — needs a budget)
+export JROPE_BENCH_BUDGET_USD=5.00
+jrope-bench run --runs 3 --mode live --model anthropic/claude-haiku-4-5 --out out/
 ```
 
-`results/report.md` gets the table, `results/results.csv` the per-probe rows
-(regime, tag, kind, distance bucket, hit, retrieval-used, answer).
-
-## Extending
-
-- New regime: subclass `RegimeBase` (`observe` / `context` / `retriever`).
-- New probe kinds: extend `scenario.generate` — probes carry
-  `expected_any` alternatives so regimes with different surface forms
-  (glyphs vs prose) score fairly.
-- The regression gate for jumping-rope development is
-  `tests/test_e2e.py::test_regime_ordering_claims`.
-
-MIT. Development plan in [ROADMAP.md](ROADMAP.md).
+Full reproduction commands: [REPRODUCE.md](REPRODUCE.md). Development plan and
+open work: [ROADMAP.md](ROADMAP.md). The rope system is reference
+implementation #1 among the conditions — RopeBench measures policies, and ships
+one. MIT.

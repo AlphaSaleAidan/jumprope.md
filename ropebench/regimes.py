@@ -245,6 +245,7 @@ CONDITION_ALIASES = {
     "carry": "full-history", "full": "full-history",
     "truncate": "truncate", "summarize": "summary", "summary": "summary",
     "rope": "rope", "unbound": "rope-unbound", "rope-unbound": "rope-unbound",
+    "streaming": "rope-streaming", "rope-streaming": "rope-streaming",
 }
 
 
@@ -261,4 +262,6 @@ def default_regimes(
     if only is None:
         return all_regimes
     wanted = {CONDITION_ALIASES.get(c, c) for c in only}
+    if "rope-streaming" in wanted:  # opt-in cost-modeling regime (B6)
+        all_regimes.append(StreamingRopeRegime())
     return [r for r in all_regimes if r.name in wanted]
