@@ -2,6 +2,8 @@
 
 [![ci](https://github.com/AlphaSaleAidan/jumprope.md/actions/workflows/ci.yml/badge.svg)](https://github.com/AlphaSaleAidan/jumprope.md/actions/workflows/ci.yml)
 
+<p align="center"><img src="assets/hero.png" width="880" alt="Jumping Rope — a session carries a dense rope of memory, leaping over the cleared transcript"></p>
+
 **Long AI sessions forget things and get expensive. Jumping Rope fixes both
 by keeping the session's memory in a small ledger instead of the chat
 history.**
