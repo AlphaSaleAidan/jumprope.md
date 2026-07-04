@@ -230,6 +230,33 @@ facts — a real model cannot reconstruct what summaries destroyed.
 
 ---
 
+## Frontier models & real sessions
+
+Two follow-up runs that raise the bar past the synthetic sweep.
+
+**It works across model tiers.** The same benchmark on Haiku 4.5, Sonnet 4.6
+and Opus 4.8 — bound rope has the best accuracy-per-token on all three:
+
+<p align="center"><img src="assets/chart-frontier.svg" width="920" alt="frontier comparison chart"></p>
+
+**How to read it.** Two bars per model: grey is carry-everything, blue is the
+rope, height is correct answers per 10,000 tokens (higher = more memory per
+dollar). The rope wins on every tier. The strongest result is Opus, where the
+rope also *beat carry-everything on raw accuracy* (96% vs 92%): a capable model
+reasons better over a small focused ledger than over a noisy full transcript,
+so here compression is not a trade-off — it is an improvement.
+
+**It survives a real Claude Code session.** We replayed an actual 117-turn
+session (`ropebench replay`, questions auto-mined from the session's own
+distinctive values). The decisive number: the full transcript is **1.35M
+tokens — it does not fit in any model's context window**, while the rope carries
+the same session in **~75K (18× smaller)** and fits comfortably. A live model
+fed the 1.35M-token transcript actually scored *worse* (43%) than the same model
+on the rope — past a point, more raw context hurts. "Carry everything" is not
+just expensive on a real long session; it is impossible.
+
+---
+
 ## 6. How it was hardened
 
 1. **52 mechanics tests** — the token cap is re-checked after every single
