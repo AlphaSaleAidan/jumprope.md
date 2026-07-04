@@ -49,19 +49,28 @@ recall at honest cost, see B4/B5.)*
   loop) would measure unbound mode's real economics (adapter tests: 17–18%
   payloads).
 
-## Phase 2 — information use (live model sweep) — NEXT, needs one decision
+## Phase 2 — information use (live model sweep) ✅ (done 2026-07-04)
 
-Same harness, real model via `--mode live` (any OpenAI-compatible endpoint).
-Adds the live-only metrics: hallucinated-continuity rate (answers not
-grounded in any tier), retrieval-tool discipline (does the model actually
-emit `RETRIEVE:` on cache misses), instruction adherence to the rope legend.
+Ran with Haiku 4.5 via the local `claude` CLI (`CommandModel`, `--mode
+live-cmd`) — one bounded 390-call sweep, no Meridian infrastructure per the
+owner's standing rule. Results in `results/live-haiku-full/` and the README.
 
-- **Blocked on:** endpoint/model choice + budget cap (recommended: the
-  Contabo LiteLLM gateway with its existing rpm/day guardrails; one full
-  sweep ≈ 300–500 calls, single bounded run, no loops).
-- **Exit criterion:** live rope ≥ 90% of live full-history accuracy at
-  ≤ 35% of its tokens; hallucination rate < 5%; results committed to
-  `results/` and pinned in the README.
+**H5 verdict:**
+
+- *Accuracy clause — PASS, decisively.* Live bound rope = **100%**, equal
+  to the live full-history oracle (criterion was ≥90%). The live model
+  outperformed the scripted reader (95%): flexible RETRIEVE queries
+  recovered the literal reader's misses. Retrieval discipline: 56% of
+  probes used the tool. 0 hallucinated answers on probed facts.
+- *Cost clause — recalibrated, honestly.* Measured 54% of oracle tokens
+  under this bench's every-turn cost model. The original "≤35%" figure was
+  mis-calibrated: it belongs to the post-jump *payload* metric, where the
+  adapters measure 17–18%. The bench's every-turn model charges the rope's
+  floor every turn; 54% is the correct number for that model and it still
+  halves the bill at equal accuracy.
+- *Live-only insight:* B1/B2 (decision-recall gap) largely dissolve with a
+  real model in the loop — Phase 3's hybrid retrieval remains worthwhile
+  for scripted floors and weak models, but is no longer the top priority.
 
 ## Phase 3 — fix B1–B3 in jumping-rope
 

@@ -1,0 +1,391 @@
+regime,probe_tag,kind,bucket,distance,hit,used_retrieval,answer
+full-history,F01,fact,short,2,1,0,The ember pawl pipeline is pinned to build **argon-1501** until further notice.
+full-history,D01,decision,short,2,1,0,We adopted argon-cache for the anchor layer because of latency constraints.
+full-history,G01,status,short,5,1,0,"""goal status update: ship the nozzle migration is now done"""
+full-history,F04,fact,short,3,1,0,The mossy gasket pipeline is pinned to build delta-7245.
+full-history,D02,decision,medium,14,1,0,"""decided to adopt basalt-queue for the manifold layer because of durability constraints"""
+full-history,F02,fact,medium,22,1,0,The jasper anchor pipeline is pinned to build `basalt-1416` until further notice.
+full-history,D04,decision,short,4,1,0,We adopted delta-ledger for the baffle layer because of portability constraints.
+full-history,G02,status,medium,20,1,0,"The status is ""pending"" — the context shows ""new goal (pending): ship the hinge migration"" with no subsequent completion"
+full-history,G04,status,short,3,1,0,"The goal to ship the gasket migration is ""pending"" — it has not been marked as done in the provided context."
+full-history,F07,fact,short,5,1,0,The lunar orifice pipeline is pinned to build granite-4632 until further notice.
+full-history,F05,fact,medium,23,1,0,The brisk manifold pipeline is pinned to build `ember-7915` until further notice.
+full-history,D05,decision,medium,13,1,0,We adopted **ember-bus** for the lattice layer because of idempotency constraints.
+full-history,F03,fact,long,35,1,0,The nickel nozzle pipeline is pinned to build cobalt-9870 until further notice.
+full-history,F10,fact,short,3,1,0,The dusky flange pipeline is pinned to build **basalt-4782** until further notice.
+full-history,D07,decision,short,4,1,0,We adopted **granite-lock** for the jig layer because of simplicity constraints.
+full-history,F08,fact,medium,20,1,0,The hollow hinge pipeline is pinned to build helium-9123 until further notice.
+full-history,G05,status,medium,16,1,0,"The goal to ship the eyelet migration is now done, according to the status update: ""goal status update: ship the eyelet "
+full-history,F11,fact,medium,16,1,0,The frosted baffle pipeline is pinned to build cobalt-8530 until further notice.
+full-history,D03,decision,long,55,1,0,cobalt-index was adopted for the hinge layer because of auditability constraints.
+full-history,D08,decision,medium,23,1,0,We adopted `helium-pool` for the eyelet layer because of throughput constraints.
+full-history,F06,fact,long,51,1,0,The pluvial jig pipeline is pinned to build flint-1475.
+full-history,F09,fact,long,38,1,0,The ionic eyelet pipeline is pinned to build `argon-4818` until further notice.
+full-history,F12,fact,medium,23,1,0,The gilded impeller pipeline is pinned to build **delta-1352** until further notice.
+full-history,D06,decision,long,41,1,0,`flint-store` for the nozzle layer because of observability constraints.
+full-history,G03,status,long,47,1,0,"The goal to ship the keel migration is complete: ""goal status update: ship the keel migration is now done""."
+full-history,G06,status,long,32,1,0,"The goal ""ship the lattice migration"" is listed as ""new goal (pending)"" in the context, with no status update provided."
+full-history,F01,fact,short,5,1,0,"The brisk manifold pipeline is pinned to ""build argon-7226 until further notice."""
+full-history,D01,decision,short,5,1,0,"We adopted **argon-cache** for the pawl layer: ""decided to adopt argon-cache for the pawl layer because of latency const"
+full-history,G01,status,short,5,1,0,"The lattice migration is now done: ""goal status update: ship the lattice migration is now done"""
+full-history,F04,fact,short,2,1,0,The frosted impeller pipeline is pinned to build delta-4778.
+full-history,F02,fact,medium,14,1,0,The pluvial pawl pipeline is pinned to build basalt-9613 until further notice.
+full-history,D04,decision,short,5,1,0,We adopted delta-ledger for the gasket layer because of portability constraints.
+full-history,G02,status,medium,20,1,0,"The goal to ship the keel migration is ""pending"" as stated in ""new goal (pending): ship the keel migration""."
+full-history,D02,decision,medium,23,1,0,"We adopted **basalt-queue** for the flange layer ""because of durability constraints."""
+full-history,G04,status,short,4,1,0,"The impeller migration goal status is ""pending"": ""new goal (pending): ship the impeller migration"" with no subsequent co"
+full-history,F07,fact,short,4,1,0,The ember hinge pipeline is pinned to build `granite-9358` until further notice.
+full-history,F05,fact,medium,17,1,0,The coral flange pipeline is pinned to build `ember-3895` until further notice.
+full-history,D07,decision,short,3,1,0,"We adopted ""granite-lock for the orifice layer because of simplicity constraints."""
+full-history,F10,fact,short,4,1,0,"The ionic anchor pipeline is pinned to ""build basalt-7793 until further notice."""
+full-history,F03,fact,long,42,1,0,The onyx lattice pipeline is pinned to build cobalt-3907 until further notice.
+full-history,D05,decision,medium,22,1,0,"""decided to adopt ember-bus for the baffle layer because of idempotency constraints"""
+full-history,F08,fact,medium,22,1,0,The jasper keel pipeline is pinned to build helium-9417 until further notice.
+full-history,F06,fact,long,39,1,0,The kelp orifice pipeline is pinned to build flint-3844 until further notice.
+full-history,F11,fact,medium,17,1,0,The amber gasket pipeline is pinned to build cobalt-6796.
+full-history,G05,status,medium,19,1,0,"""goal status update: ship the eyelet migration is now done"""
+full-history,D08,decision,medium,19,1,0,`helium-pool` for the eyelet layer because of throughput constraints.
+full-history,D03,decision,long,58,1,0,"""decided to adopt cobalt-index for the keel layer because of auditability constraints"""
+full-history,F09,fact,long,38,1,0,The dusky eyelet pipeline is pinned to build `argon-3979` until further notice.
+full-history,F12,fact,medium,23,1,0,The gilded crank pipeline is pinned to build delta-8303.
+full-history,D06,decision,long,41,1,0,We adopted `flint-store` for the lattice layer because of observability constraints.
+full-history,G03,status,long,49,1,0,"The goal to ship the dynamo migration is now done: ""goal status update: ship the dynamo migration is now done"""
+full-history,G06,status,long,32,1,0,"The goal to ship the baffle migration is ""new goal (pending)"" with no completion status update in the context."
+full-history,F01,fact,short,3,1,0,"The hollow pawl pipeline is pinned to ""build argon-2049 until further notice."""
+full-history,D01,decision,short,4,1,0,We adopted argon-cache for the impeller layer because of latency constraints.
+full-history,G01,status,short,4,1,0,"The nozzle migration is now done — ""goal status update: ship the nozzle migration is now done""."
+full-history,F04,fact,short,5,1,0,"The coral orifice pipeline is pinned to build delta-8745: ""the coral orifice pipeline is pinned to build delta-8745 unti"
+full-history,F02,fact,medium,16,1,0,The jasper impeller pipeline is pinned to build basalt-1701 until further notice.
+full-history,D04,decision,short,5,1,0,We adopted delta-ledger for the eyelet layer because of portability constraints.
+full-history,D02,decision,medium,20,1,0,"""basalt-queue for the hinge layer because of durability constraints"""
+full-history,G02,status,medium,21,1,0,"The goal to ship the dynamo migration is ""new goal (pending)"" — it has not been completed."
+full-history,G04,status,short,3,1,0,"The status is ""pending"" — the context shows ""new goal (pending): ship the orifice migration"" with no subsequent status u"
+full-history,F07,fact,short,2,1,0,The pluvial crank pipeline is pinned to build granite-6988.
+full-history,F05,fact,medium,18,1,0,The frosted hinge pipeline is pinned to build `ember-7994` until further notice.
+full-history,D07,decision,short,4,1,0,We adopted `granite-lock` for the gasket layer because of simplicity constraints.
+full-history,F08,fact,medium,14,1,0,The brisk dynamo pipeline is pinned to build helium-1587 until further notice.
+full-history,F10,fact,short,5,1,0,The gilded keel pipeline is pinned to build `basalt-5226` until further notice.
+full-history,D05,decision,medium,21,1,0,We adopted ember-bus for the lattice layer because of idempotency constraints.
+full-history,F03,fact,long,43,1,0,The ionic nozzle pipeline is pinned to build cobalt-1508 until further notice.
+full-history,F06,fact,long,39,1,0,The onyx gasket pipeline is pinned to build flint-8284 until further notice.
+full-history,F11,fact,medium,18,1,0,"The dusky eyelet pipeline is pinned to ""build cobalt-5932 until further notice."""
+full-history,D03,decision,long,53,1,0,We adopted `cobalt-index` for the dynamo layer because of auditability constraints.
+full-history,D08,decision,medium,22,1,0,"""Decided to adopt helium-pool for the jig layer because of throughput constraints."""
+full-history,G05,status,medium,25,1,0,"The goal to ship the jig migration is complete: ""goal status update: ship the jig migration is now done""."
+full-history,F09,fact,long,38,1,0,The amber jig pipeline is pinned to build argon-9108 until further notice.
+full-history,F12,fact,medium,23,1,0,The mossy manifold pipeline is pinned to build delta-9310 until further notice.
+full-history,D06,decision,long,41,1,0,We adopted `flint-store` for the nozzle layer because of observability constraints.
+full-history,G03,status,long,48,1,0,"The goal to ship the anchor migration is complete: ""goal status update: ship the anchor migration is now done."""
+full-history,G06,status,long,32,1,0,"The lattice migration goal is listed as ""new goal (pending): ship the lattice migration"" with no subsequent completion s"
+truncate,F01,fact,short,2,1,0,The ember pawl pipeline is pinned to build **argon-1501** until further notice.
+truncate,D01,decision,short,2,1,0,We adopted argon-cache for the anchor layer because of latency constraints.
+truncate,G01,status,short,5,1,0,"The nozzle migration goal is now done: ""goal status update: ship the nozzle migration is now done"""
+truncate,F04,fact,short,3,1,0,The mossy gasket pipeline is pinned to build delta-7245 until further notice.
+truncate,D02,decision,medium,14,1,0,"""basalt-queue for the manifold layer because of durability constraints"""
+truncate,F02,fact,medium,22,1,0,The jasper anchor pipeline is pinned to build `basalt-1416` until further notice.
+truncate,D04,decision,short,4,1,0,We adopted delta-ledger for the baffle layer because of portability constraints.
+truncate,G02,status,medium,20,1,0,"The goal to ship the hinge migration is marked as ""pending"" — no status update has been recorded since it was announced."
+truncate,G04,status,short,3,1,0,"The goal to ship the gasket migration is pending: ""new goal (pending): ship the gasket migration"" — no status update mar"
+truncate,F07,fact,short,5,1,0,The lunar orifice pipeline is pinned to build granite-4632 until further notice.
+truncate,F05,fact,medium,23,1,0,The brisk manifold pipeline is pinned to build `ember-7915` until further notice.
+truncate,D05,decision,medium,13,1,0,We adopted ember-bus for the lattice layer because of idempotency constraints.
+truncate,F03,fact,long,35,1,0,The nickel nozzle pipeline is pinned to build cobalt-9870 until further notice.
+truncate,F10,fact,short,3,1,0,"The dusky flange pipeline is pinned to build ""basalt-4782"" until further notice."
+truncate,D07,decision,short,4,1,0,"We adopted ""granite-lock for the jig layer because of simplicity constraints."""
+truncate,F08,fact,medium,20,1,0,The hollow hinge pipeline is pinned to build helium-9123 until further notice.
+truncate,G05,status,medium,16,1,0,"The goal to ship the eyelet migration is ""now done"" according to the status update in the context."
+truncate,F11,fact,medium,16,1,0,"The frosted baffle pipeline is pinned to build ""cobalt-8530 until further notice""."
+truncate,D03,decision,long,55,0,0,RETRIEVE: adopted for the hinge layer
+truncate,D08,decision,medium,23,1,0,We adopted `helium-pool` for the eyelet layer because of throughput constraints.
+truncate,F06,fact,long,51,0,0,RETRIEVE: pluvial jig pipeline pinned build
+truncate,F09,fact,long,38,1,0,"The ionic eyelet pipeline is pinned to ""build argon-4818 until further notice."""
+truncate,F12,fact,medium,23,1,0,"The gilded impeller pipeline is pinned to ""build delta-1352"" until further notice."
+truncate,D06,decision,long,41,1,0,"We adopted **flint-store** for the nozzle layer: ""decided to adopt flint-store for the nozzle layer because of observabi"
+truncate,G03,status,long,47,0,0,RETRIEVE: keel migration status
+truncate,G06,status,long,32,1,0,"The lattice migration is listed as ""new goal (pending): ship the lattice migration"" with no subsequent status update, so"
+truncate,F01,fact,short,5,1,0,The brisk manifold pipeline is pinned to build **argon-7226** until further notice.
+truncate,D01,decision,short,5,1,0,"We adopted argon-cache for the pawl layer ""because of latency constraints."""
+truncate,G01,status,short,5,1,0,"The lattice migration goal is ""now done"" — as stated in ""goal status update: ship the lattice migration is now done."""
+truncate,F04,fact,short,2,1,0,"The frosted impeller pipeline is pinned to ""build delta-4778 until further notice."""
+truncate,F02,fact,medium,14,1,0,The pluvial pawl pipeline is pinned to build `basalt-9613` until further notice.
+truncate,D04,decision,short,5,1,0,We adopted delta-ledger for the gasket layer because of portability constraints.
+truncate,G02,status,medium,20,1,0,"The goal to ship the keel migration is ""new goal (pending): ship the keel migration"" — no status update has been recorde"
+truncate,D02,decision,medium,23,1,0,We adopted `basalt-queue` for the flange layer because of durability constraints.
+truncate,G04,status,short,4,1,0,"The status is ""pending"": `new goal (pending): ship the impeller migration` with no completion update shown in the contex"
+truncate,F07,fact,short,4,1,0,The ember hinge pipeline is pinned to build `granite-9358` until further notice.
+truncate,F05,fact,medium,17,1,0,The coral flange pipeline is pinned to build `ember-3895` until further notice.
+truncate,D07,decision,short,3,1,0,"We adopted granite-lock for the orifice layer ""because of simplicity constraints."""
+truncate,F10,fact,short,4,1,0,The ionic anchor pipeline is pinned to build basalt-7793 until further notice.
+truncate,F03,fact,long,42,0,0,RETRIEVE: onyx lattice pipeline pinned build
+truncate,D05,decision,medium,22,1,0,"We adopted **ember-bus** for the baffle layer: ""decided to adopt ember-bus for the baffle layer because of idempotency c"
+truncate,F08,fact,medium,22,1,0,The jasper keel pipeline is pinned to build helium-9417 until further notice.
+truncate,F06,fact,long,39,1,0,The kelp orifice pipeline is pinned to build flint-3844 until further notice.
+truncate,F11,fact,medium,17,1,0,The amber gasket pipeline is pinned to build `cobalt-6796` until further notice.
+truncate,G05,status,medium,19,1,0,"The goal to ship the eyelet migration is now done: ""goal status update: ship the eyelet migration is now done"""
+truncate,D08,decision,medium,19,1,0,We adopted helium-pool for the eyelet layer because of throughput constraints.
+truncate,D03,decision,long,58,0,0,RETRIEVE: adopted for the keel layer
+truncate,F09,fact,long,38,1,0,The dusky eyelet pipeline is pinned to build argon-3979 until further notice.
+truncate,F12,fact,medium,23,1,0,The gilded crank pipeline is pinned to build delta-8303 until further notice.
+truncate,D06,decision,long,41,1,0,We adopted flint-store for the lattice layer because of observability constraints.
+truncate,G03,status,long,49,0,0,RETRIEVE: dynamo migration goal status
+truncate,G06,status,long,32,1,0,"The baffle migration status is ""new goal (pending): ship the baffle migration""—no completion update has been recorded ye"
+truncate,F01,fact,short,3,1,0,The hollow pawl pipeline is pinned to build argon-2049.
+truncate,D01,decision,short,4,1,0,We adopted argon-cache for the impeller layer because of latency constraints.
+truncate,G01,status,short,4,1,0,"""ship the nozzle migration is now done"""
+truncate,F04,fact,short,5,1,0,"The coral orifice pipeline is pinned to build ""delta-8745 until further notice""."
+truncate,F02,fact,medium,16,1,0,The jasper impeller pipeline is pinned to build basalt-1701 until further notice.
+truncate,D04,decision,short,5,1,0,We adopted delta-ledger for the eyelet layer because of portability constraints.
+truncate,D02,decision,medium,20,1,0,We adopted `basalt-queue` for the hinge layer because of durability constraints.
+truncate,G02,status,medium,21,1,0,"The goal to ship the dynamo migration is marked as ""new goal (pending): ship the dynamo migration"" with no subsequent st"
+truncate,G04,status,short,3,1,0,"The goal to ship the orifice migration is ""pending"" — it was marked as ""new goal (pending): ship the orifice migration"" "
+truncate,F07,fact,short,2,1,0,The pluvial crank pipeline is pinned to build `granite-6988` until further notice.
+truncate,F05,fact,medium,18,1,0,The frosted hinge pipeline is pinned to build `ember-7994` until further notice.
+truncate,D07,decision,short,4,1,0,"""decided to adopt granite-lock for the gasket layer because of simplicity constraints"""
+truncate,F08,fact,medium,14,1,0,The brisk dynamo pipeline is pinned to build `helium-1587`.
+truncate,F10,fact,short,5,1,0,The gilded keel pipeline is pinned to build basalt-5226 until further notice.
+truncate,D05,decision,medium,21,1,0,"We adopted ""ember-bus for the lattice layer because of idempotency constraints."""
+truncate,F03,fact,long,43,0,0,RETRIEVE: ionic nozzle pipeline pinned build
+truncate,F06,fact,long,39,1,0,The onyx gasket pipeline is pinned to build flint-8284 until further notice.
+truncate,F11,fact,medium,18,1,0,"The dusky eyelet pipeline is pinned to ""build cobalt-5932"" until further notice."
+truncate,D03,decision,long,53,0,0,RETRIEVE: adopted for the dynamo layer
+truncate,D08,decision,medium,22,1,0,We adopted helium-pool for the jig layer because of throughput constraints.
+truncate,G05,status,medium,25,1,0,"The goal ""ship the jig migration is now done"" per the status update in the context."
+truncate,F09,fact,long,38,1,0,The amber jig pipeline is pinned to build argon-9108.
+truncate,F12,fact,medium,23,1,0,The mossy manifold pipeline is pinned to build delta-9310.
+truncate,D06,decision,long,41,1,0,We adopted flint-store for the nozzle layer because of observability constraints.
+truncate,G03,status,long,48,0,0,RETRIEVE: anchor migration goal status
+truncate,G06,status,long,32,1,0,"The status of the goal to ship the lattice migration is ""pending"" (from the line ""new goal (pending): ship the lattice m"
+summary,F01,fact,short,2,1,0,The ember pawl pipeline is pinned to build argon-1501 until further notice.
+summary,D01,decision,short,2,1,0,"We ""decided to adopt argon-cache for the anchor layer because of latency constraints."""
+summary,G01,status,short,5,1,0,"The status is complete: ""ship the nozzle migration is now done."""
+summary,F04,fact,short,3,1,0,The mossy gasket pipeline is pinned to build delta-7245 until further notice.
+summary,D02,decision,medium,14,1,0,We adopted basalt-queue for the manifold layer because of durability constraints.
+summary,F02,fact,medium,22,1,0,The jasper anchor pipeline is pinned to build basalt-1416 until further notice.
+summary,D04,decision,short,4,1,0,We adopted delta-ledger for the baffle layer because of portability constraints.
+summary,G02,status,medium,20,1,0,"The hinge migration status is ""pending"" — the context shows ""new goal (pending): ship the hinge migration"" with no subse"
+summary,G04,status,short,3,1,0,"The status is pending: ""new goal (pending): ship the gasket migration"" — there is no subsequent status update marking it"
+summary,F07,fact,short,5,1,0,The lunar orifice pipeline is pinned to build `granite-4632`.
+summary,F05,fact,medium,23,1,0,"The brisk manifold pipeline is pinned to build ""ember-7915 until further notice""."
+summary,D05,decision,medium,13,1,0,We adopted **ember-bus for the lattice layer because of idempotency constraints**.
+summary,F03,fact,long,35,0,0,RETRIEVE: nickel nozzle pipeline pinned build
+summary,F10,fact,short,3,1,0,The dusky flange pipeline is pinned to build `basalt-4782` until further notice.
+summary,D07,decision,short,4,1,0,`granite-lock` for the jig layer because of simplicity constraints.
+summary,F08,fact,medium,20,1,0,The hollow hinge pipeline is pinned to build helium-9123.
+summary,G05,status,medium,16,1,0,"The goal to ship the eyelet migration is ""now done"" per the status update: ""goal status update: ship the eyelet migratio"
+summary,F11,fact,medium,16,1,0,The frosted baffle pipeline is pinned to build `cobalt-8530` until further notice.
+summary,D03,decision,long,55,0,0,RETRIEVE: hinge layer adoption
+summary,D08,decision,medium,23,1,0,"`helium-pool` was adopted for the eyelet layer ""because of throughput constraints."""
+summary,F06,fact,long,51,0,0,RETRIEVE: pluvial jig pipeline pinned
+summary,F09,fact,long,38,0,0,RETRIEVE: ionic eyelet pipeline pinned build
+summary,F12,fact,medium,23,1,0,"The gilded impeller pipeline is pinned to build delta-1352: ""the gilded impeller pipeline is pinned to build delta-1352 "
+summary,D06,decision,long,41,0,0,RETRIEVE: nozzle layer adoption
+summary,G03,status,long,47,0,0,RETRIEVE: keel migration status
+summary,G06,status,long,32,1,0,"""new goal (pending): ship the lattice migration"" — the status is pending."
+summary,F01,fact,short,5,1,0,"The brisk manifold pipeline is pinned to ""build argon-7226 until further notice""."
+summary,D01,decision,short,5,1,0,We adopted argon-cache for the pawl layer because of latency constraints.
+summary,G01,status,short,5,1,0,"The goal to ship the lattice migration is ""now done"" — as stated in the goal status update."
+summary,F04,fact,short,2,1,0,"The frosted impeller pipeline is pinned to ""build delta-4778 until further notice."""
+summary,F02,fact,medium,14,1,0,The pluvial pawl pipeline is pinned to build basalt-9613 until further notice.
+summary,D04,decision,short,5,1,0,"We adopted ""delta-ledger for the gasket layer because of portability constraints."""
+summary,G02,status,medium,20,1,0,"The goal to ship the keel migration is listed as ""new goal (pending)"" with no subsequent status update indicating comple"
+summary,D02,decision,medium,23,1,0,We adopted `basalt-queue` for the flange layer because of durability constraints.
+summary,G04,status,short,4,1,0,"The impeller migration status is ""new goal (pending): ship the impeller migration"" — no completion update has been logge"
+summary,F07,fact,short,4,1,0,"The ember hinge pipeline is pinned to ""build granite-9358 until further notice."""
+summary,F05,fact,medium,17,1,0,The coral flange pipeline is pinned to build `ember-3895` until further notice.
+summary,D07,decision,short,3,1,0,We adopted **granite-lock** for the orifice layer because of simplicity constraints.
+summary,F10,fact,short,4,1,0,The ionic anchor pipeline is pinned to build basalt-7793.
+summary,F03,fact,long,42,0,0,RETRIEVE: onyx lattice pipeline pinned build
+summary,D05,decision,medium,22,1,0,"We adopted ""ember-bus for the baffle layer because of idempotency constraints."""
+summary,F08,fact,medium,22,1,0,The jasper keel pipeline is pinned to build helium-9417 until further notice.
+summary,F06,fact,long,39,0,0,RETRIEVE: kelp orifice pipeline pinned build
+summary,F11,fact,medium,17,1,0,The amber gasket pipeline is pinned to build cobalt-6796 until further notice.
+summary,G05,status,medium,19,1,0,"The goal to ship the eyelet migration is now done: ""goal status update: ship the eyelet migration is now done"""
+summary,D08,decision,medium,19,1,0,We adopted helium-pool for the eyelet layer because of throughput constraints.
+summary,D03,decision,long,58,0,0,"Based on the context provided, we adopted **flint-store** for the keel layer (the decision appears after ""the jasper kee"
+summary,F09,fact,long,38,0,0,RETRIEVE: dusky eyelet pipeline pinned build
+summary,F12,fact,medium,23,1,0,The gilded crank pipeline is pinned to build delta-8303 until further notice.
+summary,D06,decision,long,41,0,0,RETRIEVE: what was adopted for the lattice layer
+summary,G03,status,long,49,0,0,RETRIEVE: dynamo migration status
+summary,G06,status,long,32,1,0,"The goal to ship the baffle migration is marked as ""pending"" — there is a ""new goal (pending): ship the baffle migration"
+summary,F01,fact,short,3,1,0,The hollow pawl pipeline is pinned to build argon-2049.
+summary,D01,decision,short,4,1,0,We adopted **argon-cache** for the impeller layer because of latency constraints.
+summary,G01,status,short,4,1,0,"The status is done: ""goal status update: ship the nozzle migration is now done"""
+summary,F04,fact,short,5,1,0,The coral orifice pipeline is pinned to build `delta-8745` until further notice.
+summary,F02,fact,medium,16,1,0,The jasper impeller pipeline is pinned to build `basalt-1701` until further notice.
+summary,D04,decision,short,5,1,0,We adopted `delta-ledger` for the eyelet layer because of portability constraints.
+summary,D02,decision,medium,20,1,0,We adopted `basalt-queue` for the hinge layer because of durability constraints.
+summary,G02,status,medium,21,1,0,"The dynamo migration is marked as ""new goal (pending): ship the dynamo migration"" with no subsequent status update, so i"
+summary,G04,status,short,3,1,0,"The orifice migration goal is marked as ""pending"" — there is no subsequent status update indicating completion."
+summary,F07,fact,short,2,1,0,The pluvial crank pipeline is pinned to build `granite-6988` until further notice.
+summary,F05,fact,medium,18,1,0,The frosted hinge pipeline is pinned to build ember-7994 until further notice.
+summary,D07,decision,short,4,1,0,We adopted `granite-lock` for the gasket layer because of simplicity constraints.
+summary,F08,fact,medium,14,1,0,The brisk dynamo pipeline is pinned to build helium-1587.
+summary,F10,fact,short,5,1,0,The gilded keel pipeline is pinned to build basalt-5226 until further notice.
+summary,D05,decision,medium,21,1,0,"We adopted ""ember-bus for the lattice layer because of idempotency constraints."""
+summary,F03,fact,long,43,0,0,RETRIEVE: ionic nozzle pipeline pinned build
+summary,F06,fact,long,39,0,0,RETRIEVE: onyx gasket pipeline build pin
+summary,F11,fact,medium,18,1,0,The dusky eyelet pipeline is pinned to build cobalt-5932.
+summary,D03,decision,long,53,0,0,RETRIEVE: dynamo layer adoption decision
+summary,D08,decision,medium,22,1,0,"""We decided to adopt helium-pool for the jig layer because of throughput constraints."""
+summary,G05,status,medium,25,1,0,"The goal status is ""ship the jig migration is now done."""
+summary,F09,fact,long,38,0,0,RETRIEVE: amber jig pipeline pinned build
+summary,F12,fact,medium,23,1,0,"The mossy manifold pipeline is pinned to build delta-9310: ""the mossy manifold pipeline is pinned to build delta-9310 un"
+summary,D06,decision,long,41,0,0,RETRIEVE: nozzle layer adoption
+summary,G03,status,long,48,0,0,RETRIEVE: anchor migration goal status
+summary,G06,status,long,32,1,0,"The status is ""pending"": the context shows ""new goal (pending): ship the lattice migration"" with no subsequent status up"
+rope,F01,fact,short,2,1,0,The ember pawl pipeline is pinned to build **argon-1501** until further notice.
+rope,D01,decision,short,2,1,0,"argon-cache for the anchor layer (D4, because of latency constraints)."
+rope,G01,status,short,5,1,0,`✓ G1|new goal (◌): ship nozzle migr` — the nozzle migration goal is marked as done.
+rope,F04,fact,short,3,1,0,"The mossy gasket pipeline is pinned to ""build delta-7245"" according to O1 in the OPEN section."
+rope,D02,decision,medium,14,1,1,"We adopted **basalt-queue for the manifold layer** ∵ durability constraints (D12, 2026-07-03)."
+rope,F02,fact,medium,22,1,1,The jasper anchor pipeline is pinned to build **basalt-1416** until further notice.
+rope,D04,decision,short,4,1,0,"We adopted **delta-ledger** for the baffle layer (D1, 2026-07-03, due to portability constraints)."
+rope,G02,status,medium,20,1,0,"G2 is `◌` (pending): ""ship hinge migr"""
+rope,G04,status,short,3,1,0,`◌ G4|new goal (◌): ship gasket migr` — the gasket migration goal is pending.
+rope,F07,fact,short,5,1,1,The lunar orifice pipeline is pinned to build **granite-4632** until further notice.
+rope,F05,fact,medium,23,1,1,The brisk manifold pipeline is pinned to build **ember-7915** until further notice.
+rope,D05,decision,medium,13,1,1,We adopted **ember-bus** for the lattice layer because of idempotency constraints (D9|2026-07-03).
+rope,F03,fact,long,35,1,1,The nickel nozzle pipeline is pinned to build **cobalt-9870**.
+rope,F10,fact,short,3,1,0,The dusky flange pipeline is pinned to build `basalt-4782`.
+rope,D07,decision,short,4,1,0,"granite-lock for the jig layer (D4: ""decided to adopt granite-lock for jig layer ∵ simplicity constraints"")"
+rope,F08,fact,medium,20,1,1,The hollow hinge pipeline is pinned to build **helium-9123** until further notice.
+rope,G05,status,medium,16,1,0,The eyelet migration goal is marked as done: `✓ G5|new goal (◌): ship eyelet migr`
+rope,F11,fact,medium,16,1,1,The frosted baffle pipeline is pinned to build **cobalt-8530** until further notice.
+rope,D03,decision,long,55,1,1,"We adopted **cobalt-index** for the hinge layer (D5, 2026-07-03) because of auditability constraints."
+rope,D08,decision,medium,23,1,1,We adopted **helium-pool for eyelet layer** because of throughput constraints.
+rope,F06,fact,long,51,1,1,The pluvial jig pipeline is pinned to build **flint-1475** until further notice.
+rope,F09,fact,long,38,1,1,The ionic eyelet pipeline is pinned to build **argon-4818** until further notice.
+rope,F12,fact,medium,23,1,1,The gilded impeller pipeline is pinned to build **delta-1352** until further notice.
+rope,D06,decision,long,41,1,1,"We adopted **flint-store** for the nozzle layer ""∵ observability constraints"" (per D6/2026-07-03)."
+rope,G03,status,long,47,1,0,✓ G3|new goal (◌): ship keel migr — the keel migration is marked done.
+rope,G06,status,long,32,1,0,G6 (ship lattice migration) is **pending** (◌).
+rope,F01,fact,short,5,1,0,The brisk manifold pipeline is pinned to build `argon-7226` until further notice.
+rope,D01,decision,short,5,1,0,"According to D4, we ""decided to adopt argon-cache for pawl layer ∵ latency constraints."""
+rope,G01,status,short,5,1,0,✓ G1|new goal (◌): ship lattice migr — marked as done.
+rope,F04,fact,short,2,1,0,"The frosted impeller pipeline is pinned to build **delta-4778** (from O1: ""frosted impeller pipeline pinned to build del"
+rope,F02,fact,medium,14,1,1,The pluvial pawl pipeline is pinned to build **basalt-9613** until further notice.
+rope,D04,decision,short,5,1,0,"We adopted **delta-ledger** for the gasket layer (D1|2026-07-03, decided due to portability constraints)."
+rope,G02,status,medium,20,1,0,G2's status is `◌ G2|new goal (◌): ship keel migr` — pending.
+rope,D02,decision,medium,23,1,1,"We adopted **basalt-queue** for the flange layer (D12, 2026-07-03) because of durability constraints."
+rope,G04,status,short,4,1,0,"G4 is `◌ (pending)`: ""◌ G4|new goal (◌): ship impeller migr"""
+rope,F07,fact,short,4,1,1,The ember hinge pipeline is pinned to build **granite-9358** until further notice.
+rope,F05,fact,medium,17,1,1,The coral flange pipeline is pinned to build `ember-3895` until further notice.
+rope,D07,decision,short,3,1,0,"We adopted **granite-lock for the orifice layer** (D4, 2026-07-03) because of simplicity constraints."
+rope,F10,fact,short,4,1,1,The ionic anchor pipeline is pinned to build **basalt-7793** until further notice.
+rope,F03,fact,long,42,1,1,The onyx lattice pipeline is pinned to build **cobalt-3907**.
+rope,D05,decision,medium,22,1,1,"We adopted **ember-bus** for the baffle layer (D9: ""decided to adopt ember-bus for baffle layer ∵ idempotency constraint"
+rope,F08,fact,medium,22,1,1,The jasper keel pipeline is pinned to build **helium-9417** until further notice.
+rope,F06,fact,long,39,1,1,The kelp orifice pipeline is pinned to build **flint-3844** until further notice.
+rope,F11,fact,medium,17,1,1,The amber gasket pipeline is pinned to build **cobalt-6796** until further notice.
+rope,G05,status,medium,19,1,0,G5 (ship eyelet migration) is marked **✓done** according to the goals list.
+rope,D08,decision,medium,19,1,1,We adopted **helium-pool** for the eyelet layer because of throughput constraints (per D2|2026-07-03).
+rope,D03,decision,long,58,1,1,"Cobalt-index was adopted for the keel layer (D5, 2026-07-03) due to auditability constraints."
+rope,F09,fact,long,38,1,1,The dusky eyelet pipeline is pinned to build **argon-3979**.
+rope,F12,fact,medium,23,1,1,The gilded crank pipeline is pinned to build **delta-8303** until further notice.
+rope,D06,decision,long,41,1,1,"We adopted **flint-store** for the lattice layer (decision D6, 2026-07-03) because of observability constraints."
+rope,G03,status,long,49,1,0,"✓ G3 is marked done — ""ship dynamo migr"" is complete."
+rope,G06,status,long,32,1,0,"G6, the goal to ship the baffle migration, is `◌` (pending)."
+rope,F01,fact,short,3,1,0,"The hollow pawl pipeline is pinned to build ""argon-2049"" until further notice."
+rope,D01,decision,short,4,1,0,"D4: ""decided to adopt argon-cache for impeller layer ∵ latency constraints"""
+rope,G01,status,short,4,1,0,"The goal to ship the nozzle migration is marked as ✓ (done) per the line: ""✓ G1|new goal (◌): ship nozzle migr""."
+rope,F04,fact,short,5,1,0,"The coral orifice pipeline is pinned to build delta-8745 (from OPEN: ""O1|P2|coral orifice pipeline pinned to build delta"
+rope,F02,fact,medium,16,1,1,The jasper impeller pipeline is pinned to build `basalt-1701`.
+rope,D04,decision,short,5,1,0,"delta-ledger was adopted for the eyelet layer (D1: ""decided to adopt delta-ledger for eyelet layer ∵ portability constra"
+rope,D02,decision,medium,20,1,1,"We adopted **basalt-queue** for the hinge layer (D12, due to durability constraints)."
+rope,G02,status,medium,21,1,0,"G2 shows status ""◌"" (pending): ""ship dynamo migr"""
+rope,G04,status,short,3,1,0,The orifice migration goal (G4) is `◌ pending`: `◌ G4|new goal (◌): ship orifice migr`
+rope,F07,fact,short,2,1,1,The pluvial crank pipeline is pinned to build **granite-6988** until further notice.
+rope,F05,fact,medium,18,1,1,The frosted hinge pipeline is pinned to build **ember-7994**.
+rope,D07,decision,short,4,1,0,"We ""decided to adopt granite-lock for gasket layer ∵ simplicity constraints"" (D4)."
+rope,F08,fact,medium,14,1,1,The brisk dynamo pipeline is pinned to build **helium-1587** until further notice.
+rope,F10,fact,short,5,1,1,The gilded keel pipeline is pinned to build **basalt-5226** until further notice.
+rope,D05,decision,medium,21,1,1,We adopted **ember-bus** for the lattice layer because of idempotency constraints (D9).
+rope,F03,fact,long,43,1,1,The ionic nozzle pipeline is pinned to build **cobalt-1508**.
+rope,F06,fact,long,39,1,1,The onyx gasket pipeline is pinned to build **flint-8284** until further notice.
+rope,F11,fact,medium,18,1,1,The dusky eyelet pipeline is pinned to build **cobalt-5932** until further notice (per svc/eyelet.py).
+rope,D03,decision,long,53,1,1,"We adopted **cobalt-index for the dynamo layer** due to auditability constraints (D5, 2026-07-03)."
+rope,D08,decision,medium,22,1,1,"We adopted **helium-pool for the jig layer** because of throughput constraints (D2, 2026-07-03)."
+rope,G05,status,medium,25,1,0,✓ G5 is complete — ship jig migration is done.
+rope,F09,fact,long,38,1,1,The amber jig pipeline is pinned to build `argon-9108` until further notice.
+rope,F12,fact,medium,23,1,1,The mossy manifold pipeline is pinned to build **delta-9310**.
+rope,D06,decision,long,41,1,1,"We adopted **flint-store** for the nozzle layer because of observability constraints (D6, 2026-07-03)."
+rope,G03,status,long,48,1,0,✓ G3|new goal (◌): ship anchor migr — **done**.
+rope,G06,status,long,32,1,0,The lattice migration goal is pending: `◌ G6|new goal (◌): ship lattice migr`
+rope-unbound,F01,fact,short,2,1,0,"The ember pawl pipeline is pinned to build `argon-1501` (from DELTA: ""ember pawl pipeline pinned to build argon-1501 unt"
+rope-unbound,D01,decision,short,2,1,0,"argon-cache for the anchor layer (D4: ""decided to adopt argon-cache for anchor layer ∵ latency constraints"")."
+rope-unbound,G01,status,short,5,1,0,The goal to ship the nozzle migration is marked as `✓ G1|new goal (◌): ship nozzle migr` — completed.
+rope-unbound,F04,fact,short,3,1,0,The mossy gasket pipeline is pinned to build **delta-7245** (O2|P2).
+rope-unbound,D02,decision,medium,14,1,0,"D12 states: ""decided to adopt basalt-queue for manifold layer ∵ durability constraints"""
+rope-unbound,F02,fact,medium,22,1,0,The jasper anchor pipeline is pinned to build basalt-1416.
+rope-unbound,D04,decision,short,4,1,0,"We adopted **delta-ledger** for the baffle layer (D28, 2026-07-03, ∵ portability constraints)."
+rope-unbound,G02,status,medium,20,1,0,The goal to ship the hinge migration (G2) is `◌` (pending).
+rope-unbound,G04,status,short,3,1,0,The goal to ship the gasket migration (G4) is `◌ pending`.
+rope-unbound,F07,fact,short,5,1,0,The lunar orifice pipeline is pinned to build `granite-4632`.
+rope-unbound,F05,fact,medium,23,1,0,The brisk manifold pipeline is pinned to build `ember-7915` until further notice.
+rope-unbound,D05,decision,medium,13,1,0,ember-bus was adopted for the lattice layer to address idempotency constraints (D36).
+rope-unbound,F03,fact,long,35,1,0,The nickel nozzle pipeline is pinned to build `cobalt-9870`.
+rope-unbound,F10,fact,short,3,1,0,The dusky flange pipeline is pinned to build `basalt-4782` (from O5).
+rope-unbound,D07,decision,short,4,1,0,"D52 states: ""decided to adopt granite-lock for jig layer ∵ simplicity constraints"""
+rope-unbound,F08,fact,medium,20,1,0,The hollow hinge pipeline is pinned to build helium-9123 (O4|P2).
+rope-unbound,G05,status,medium,16,1,0,The eyelet migration goal is marked as complete: `✓ G5|new goal (◌): ship eyelet migr`.
+rope-unbound,F11,fact,medium,16,1,0,The frosted baffle pipeline is pinned to build `cobalt-8530` until further notice.
+rope-unbound,D03,decision,long,55,1,0,D20 shows we adopted **cobalt-index for hinge layer** ∵ auditability constraints.
+rope-unbound,D08,decision,medium,23,1,0,"D60 states: ""decided to adopt helium-pool for eyelet layer ∵ throughput constraints."""
+rope-unbound,F06,fact,long,51,1,0,The pluvial jig pipeline is pinned to build flint-1475 until further notice (O3).
+rope-unbound,F09,fact,long,38,1,0,The ionic eyelet pipeline is pinned to build `argon-4818` (from the DELTA: `svc/eyelet.py|mod|ionic eyelet pipeline pinn
+rope-unbound,F12,fact,medium,23,1,0,The gilded impeller pipeline is pinned to build `delta-1352` (from O6 in the OPEN section).
+rope-unbound,D06,decision,long,41,1,0,"We adopted flint-store for the nozzle layer ∵ observability constraints (D44, 2026-07-03)."
+rope-unbound,G03,status,long,47,1,0,"The keel migration goal (G3) is marked **✓ done**: ""✓ G3|new goal (◌): ship keel migr"""
+rope-unbound,G06,status,long,32,1,0,G6 (ship lattice migration) is `◌pending`.
+rope-unbound,F01,fact,short,5,1,0,"The brisk manifold pipeline is pinned to build argon-7226: ""brisk manifold pipeline pinned to build argon-7226 until fur"
+rope-unbound,D01,decision,short,5,1,0,"According to D4 (2026-07-03): ""decided to adopt argon-cache for pawl layer ∵ latency constraints."""
+rope-unbound,G01,status,short,5,1,0,"According to the GOALS section, the lattice migration goal is marked as done: `✓ G1|new goal (◌): ship lattice migr`"
+rope-unbound,F04,fact,short,2,1,0,"The frosted impeller pipeline is pinned to build delta-4778: ""O2|P2|frosted impeller pipeline pinned to build delta-4778"
+rope-unbound,F02,fact,medium,14,1,0,The pluvial pawl pipeline is pinned to build `basalt-9613` (O1|P2|pluvial pawl pipeline pinned to build basalt-9613 unti
+rope-unbound,D04,decision,short,5,1,0,"D28 states: ""decided to adopt delta-ledger for gasket layer ∵ portability constraints"""
+rope-unbound,G02,status,medium,20,1,0,The keel migration goal (G2) is `◌ pending`.
+rope-unbound,D02,decision,medium,23,1,0,We adopted **basalt-queue** for the flange layer because of durability constraints (decision D12).
+rope-unbound,G04,status,short,4,1,0,◌ G4|new goal (◌): ship impeller migr — pending.
+rope-unbound,F07,fact,short,4,1,0,The ember hinge pipeline is pinned to build `granite-9358` (from `svc/hinge.py|mod|ember hinge pipeline pinned to build 
+rope-unbound,F05,fact,medium,17,1,0,The coral flange pipeline is pinned to build **ember-3895** until further notice.
+rope-unbound,D07,decision,short,3,1,0,"According to D52: ""decided to adopt granite-lock for orifice layer ∵ simplicity constraints."""
+rope-unbound,F10,fact,short,4,1,0,The ionic anchor pipeline is pinned to build `basalt-7793` until further notice.
+rope-unbound,F03,fact,long,42,1,0,The onyx lattice pipeline is pinned to build `cobalt-3907` until further notice.
+rope-unbound,D05,decision,medium,22,1,0,"We adopted **ember-bus** for the baffle layer (decision D36, because of idempotency constraints)."
+rope-unbound,F08,fact,medium,22,1,0,The jasper keel pipeline is pinned to build `helium-9417` (from O4 in the OPEN section).
+rope-unbound,F06,fact,long,39,1,0,The kelp orifice pipeline is pinned to build `flint-3844` (O3).
+rope-unbound,F11,fact,medium,17,1,0,The amber gasket pipeline is pinned to build `cobalt-6796` until further notice (from `svc/gasket.py|mod`).
+rope-unbound,G05,status,medium,19,1,0,✓ G5|new goal (◌): ship eyelet migr — marked done.
+rope-unbound,D08,decision,medium,19,1,0,D60 decided to adopt **helium-pool** for eyelet layer ∵ throughput constraints.
+rope-unbound,D03,decision,long,58,1,0,D20 decided to adopt **cobalt-index** for the keel layer.
+rope-unbound,F09,fact,long,38,1,0,The dusky eyelet pipeline is pinned to build `argon-3979` until further notice.
+rope-unbound,F12,fact,medium,23,1,0,The gilded crank pipeline is pinned to build `delta-8303`.
+rope-unbound,D06,decision,long,41,1,0,We adopted **flint-store** for the lattice layer (D44) due to observability constraints.
+rope-unbound,G03,status,long,49,1,0,✓ G3|new goal (◌): ship dynamo migr — the dynamo migration goal is complete.
+rope-unbound,G06,status,long,32,1,0,`◌ G6|new goal (◌): ship baffle migr` — the baffle migration goal is pending.
+rope-unbound,F01,fact,short,3,1,0,The hollow pawl pipeline is pinned to build **argon-2049** until further notice.
+rope-unbound,D01,decision,short,4,1,0,"According to D4, we adopted **argon-cache** for the impeller layer because of latency constraints."
+rope-unbound,G01,status,short,4,1,0,"✓ G1 is marked done, though the notation shows (◌) pending: `✓ G1|new goal (◌): ship nozzle migr`"
+rope-unbound,F04,fact,short,5,1,0,"The coral orifice pipeline is pinned to build delta-8745: ""O2|P2|coral orifice pipeline pinned to build delta-8745 until"
+rope-unbound,F02,fact,medium,16,1,0,The jasper impeller pipeline is pinned to build `basalt-1701` (O1|P2|jasper impeller pipeline pinned to build basalt-170
+rope-unbound,D04,decision,short,5,1,0,"We adopted **delta-ledger** for the eyelet layer: ""D28|2026-07-03|decided to adopt delta-ledger for eyelet layer ∵ porta"
+rope-unbound,D02,decision,medium,20,1,0,"D12 states: ""decided to adopt basalt-queue for hinge layer ∵ durability constraints."""
+rope-unbound,G02,status,medium,21,1,0,G2 (ship dynamo migration) is `◌` (pending).
+rope-unbound,G04,status,short,3,1,0,`◌ G4|new goal (◌): ship orifice migr` — the goal is pending.
+rope-unbound,F07,fact,short,2,1,0,The pluvial crank pipeline is pinned to build `granite-6988`.
+rope-unbound,F05,fact,medium,18,1,0,The frosted hinge pipeline is pinned to build `ember-7994` (from `svc/hinge.py|mod|frosted hinge pipeline pinned to buil
+rope-unbound,D07,decision,short,4,1,0,"We adopted ""granite-lock for gasket layer"" (D52, 2026-07-03)."
+rope-unbound,F08,fact,medium,14,1,0,The brisk dynamo pipeline is pinned to build `helium-1587` until further notice.
+rope-unbound,F10,fact,short,5,1,0,The gilded keel pipeline is pinned to build `basalt-5226` (O5|P2).
+rope-unbound,D05,decision,medium,21,1,0,"We adopted ember-bus for the lattice layer (D36, per idempotency constraints)."
+rope-unbound,F03,fact,long,43,1,0,The ionic nozzle pipeline is pinned to build `cobalt-1508` until further notice.
+rope-unbound,F06,fact,long,39,1,0,The onyx gasket pipeline is pinned to build `flint-8284`.
+rope-unbound,F11,fact,medium,18,1,0,The dusky eyelet pipeline is pinned to build `cobalt-5932`.
+rope-unbound,D03,decision,long,53,1,0,"D20: ""decided to adopt **cobalt-index** for dynamo layer ∵ auditability constraints"""
+rope-unbound,D08,decision,medium,22,1,0,"D60 states: ""decided to adopt helium-pool for jig layer ∵ throughput constraints"""
+rope-unbound,G05,status,medium,25,1,0,✓ G5|new goal (◌): ship jig migr — marked as done.
+rope-unbound,F09,fact,long,38,1,0,The amber jig pipeline is pinned to build `argon-9108` until further notice.
+rope-unbound,F12,fact,medium,23,1,0,The mossy manifold pipeline is pinned to build `delta-9310` (from O6).
+rope-unbound,D06,decision,long,41,1,0,"We adopted **flint-store** for the nozzle layer (D44: ""decided to adopt flint-store for nozzle layer ∵ observability con"
+rope-unbound,G03,status,long,48,1,0,`✓ G3|new goal (◌): ship anchor migr` — the anchor migration goal is complete.
+rope-unbound,G06,status,long,32,1,0,G6 is pending (◌): `ship lattice migr`.

@@ -64,6 +64,36 @@ a full ISO date). Unbound's economics win against real chat transcripts —
 17–18% payloads measured in the adapter tests — which this event-driven
 scenario does not model. Findings B1–B5 in `ROADMAP.md`.
 
+## Live results (real model in the loop)
+
+Same harness, Haiku 4.5 answering instead of the scripted reader
+(3 seeds × 80 turns, 390 probe calls via `--mode live-cmd --cmd
+"claude -p --model haiku"`; raw output in `results/live-haiku-full/`):
+
+| Regime | Acc | short | medium | long | fact | decision | status | retrieval | tokens | acc/10k tok |
+|---|---|---|---|---|---|---|---|---|---|---|
+| full-history | 100% | 100% | 100% | 100% | 100% | 100% | 100% | 0% | 280,455 | 3.6 |
+| truncate | 88% | 100% | 100% | 57% | 92% | 88% | 83% | 0% | 201,517 | 4.4 |
+| summary | 77% | 100% | 100% | 14% | 75% | 75% | 83% | 0% | 192,357 | 4.0 |
+| **rope (bound)** | **100%** | 100% | 100% | **100%** | 100% | 100% | 100% | 56% | **150,560** | **6.6** |
+| rope-unbound | 100% | 100% | 100% | 100% | 100% | 100% | 100% | 0% | 498,828 | 2.0 |
+
+Three findings:
+
+1. **A real model on the bound rope is indistinguishable from the same
+   model on the full transcript** — 100% vs 100%, at 54% of the tokens.
+   The live model *beat* the scripted reader (95%): where the literal
+   reader's lexical matching missed, Haiku composed better `RETRIEVE:`
+   queries and recovered the fact. Retrieval was load-bearing on 56% of
+   probes; every answer contained the ground-truth value (0 hallucinated
+   answers on probed facts).
+2. **The lossy baselines are worse live than scripted.** Auto-summarize
+   fell to 14% on long-distance facts (scripted: 24%) — a real model
+   cannot reconstruct what summarization destroyed, and unlike the
+   scripted reader it does not get lucky on mangled fragments.
+3. **Unbound stays perfect live** (100%, zero retrievals) with the same
+   honest cost profile as scripted (see B4/B5).
+
 ## Run it
 
 ```bash
