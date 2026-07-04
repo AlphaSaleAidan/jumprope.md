@@ -204,6 +204,42 @@ class RopeUnboundRegime(RopeRegime):
         # No jump: the rope is the persistent record.
 
 
+class StreamingRopeRegime(RopeRegime):
+    """Unbound rope with REAL streaming transcript eviction (closes B6).
+
+    Instead of recording distilled events, this replays the scenario as a
+    chat transcript and drives the *actual* ``apply_streaming_policy`` from
+    jumping_rope — no reimplementation. Each turn the outbound payload is
+    ``[system: rope] + uncovered transcript tail``; covered messages evict to
+    the vault, so the payload stays flat instead of growing with history.
+    Per-turn cost is that real outbound payload — the accounting the
+    event-driven regimes could not do, and where unbound mode's economics
+    actually live.
+    """
+
+    name = "rope-streaming"
+
+    def __init__(self, data_dir: str | Path | None = None) -> None:
+        super().__init__(data_dir=data_dir, config=JumpConfig.unbound())
+        self._messages: list[dict[str, str]] = []
+        self._last_outbound_tokens = 0
+
+    def observe(self, turn: int, events: list[Event]) -> None:
+        from jumping_rope.handoff import apply_streaming_policy
+
+        text = " ".join(e.text for e in events)
+        self._messages.append({"role": "user", "content": text})
+        outbound, _evicted = apply_streaming_policy(self.session, self._messages)
+        self._last_outbound_tokens = sum(
+            count_tokens(str(m.get("content", ""))) for m in outbound
+        )
+        self._messages.append({"role": "assistant", "content": f"noted turn {turn}"})
+
+    def end_turn(self) -> None:
+        # Cost is the real outbound payload, not just the rope render.
+        self.turn_tokens.append(self._last_outbound_tokens)
+
+
 # Short aliases accepted on the CLI (--conditions), mapped to regime names.
 CONDITION_ALIASES = {
     "carry": "full-history", "full": "full-history",
