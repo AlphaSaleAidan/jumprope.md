@@ -127,3 +127,17 @@ def test_command_model_failure_scores_as_miss() -> None:
     model = CommandModel(argv=[sys.executable, "-c", "import sys; sys.exit(3)"])
     answer = model.answer(CONTEXT, "anything?")
     assert answer.text == ""
+
+
+def test_command_model_context_exceeded_short_circuits() -> None:
+    from ropebench.models import CommandModel
+
+    # A command that would print if invoked — the guard must short-circuit
+    # before it ever runs.
+    model = CommandModel(
+        argv=[sys.executable, "-c", "print('SHOULD NOT RUN')"],
+        max_context_tokens=50,
+    )
+    answer = model.answer("token " * 500, "what?")  # well over 50 tokens
+    assert answer.text == CommandModel.CONTEXT_EXCEEDED
+    assert not answer.used_retrieval
