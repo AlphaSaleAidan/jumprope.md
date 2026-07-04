@@ -61,10 +61,17 @@ who's reading**, and we report both honestly:
 - **Literal reader (scripted, n=150):** rope **trails** full-history by 6.7%
   (95% CI [−10.7%, −2.7%] — significant). A keyword-matcher does not exploit
   the retrieval tool well. `CLAIMS.md` C6.
-- **Real model (live, information-use):** the gap closes or reverses — a model
-  writes good vault queries where a matcher can't. Earlier live runs put rope
-  at parity with the oracle; a multi-seed hardened rerun is in flight
-  (`CLAIMS.md` C7).
+- **Real model (live, Haiku, n=90):** the rope still **trails** full-history,
+  but only by 4.0% (95% CI [−8.9%, −1.1%]) — a real model narrows the gap a
+  literal reader can't, from −6.7% to −4.0%. And it **beats summary by +22.2%**
+  (CI [+11.1%, +31.1%]) at 60% of the oracle's tokens (efficiency 7.2 vs 4.5).
+  `CLAIMS.md` C7.
+
+The honest summary: the rope is **not quite as accurate as carrying the whole
+transcript** — a few significant points below, even live — but it trades that
+for huge cost savings, it crushes the summarization every framework ships, and
+on a long-enough session the oracle it trails **does not fit in the window at
+all** (Finding 2).
 
 What is **not** claimed: the single-seed Opus "rope beats carry-all 96 vs 92"
 result (n=26) is directional only — its CI is not established, so it is not a

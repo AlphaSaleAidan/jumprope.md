@@ -13,7 +13,7 @@ Regenerate CI-tier rows from a fresh clone with the commands in
 | C4 | Rope beats summary overall (scripted) | +22.7% | 150 | [+14.7%, +30.7%] | same | same |
 | C5 | Rope beats truncate overall (scripted) | +7.3% | 150 | [+0.7%, +14.7%] | same | same |
 | C6 | Rope trails full-history with the LITERAL reader (scripted) | −6.7% | 150 | [−10.7%, −2.7%] | same | same |
-| C7 | Rope ≈ full-history with a LIVE model (Haiku, information-use) | see report.json | 78 | pending hardened rerun | `results/live-haiku-full/` | `jrope-bench run --runs 3 --mode live-cmd --cmd "claude -p --model haiku"` |
+| C7 | Rope trails full-history with a LIVE model but beats summary (Haiku) | −4.0% vs carry / +22.2% vs summary | 90 | [−8.9%, −1.1%] / [+11.1%, +31.1%] | `results/live-hardened-haiku/result.json` | `jrope-bench run --runs 3 --mode live-cmd --cmd "claude -p --model haiku" --conditions rope,carry,summarize` |
 | C8 | Streaming-unbound cost on a chatty transcript (chatty=16) | 29% of full-history | — | (measurement, not accuracy) | `tests/test_b6.py` | `pytest tests/test_b6.py` |
 | C9 | Notation density reduction vs prose (symbolic-en) | 42.1% | — | fixed fixture | jumping-rope `tests/test_density.py` | `pytest -k density` (jumping-rope) |
 | C10 | Real 117-turn transcript token size | 1.35M tok | — | existence proof | `results/live-haiku-full` / Phase 5 | `jrope-bench run --transcript <session>` |
