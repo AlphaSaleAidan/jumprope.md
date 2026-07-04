@@ -117,11 +117,12 @@ def run_benchmark(
     n_turns: int = 80,
     model: Model | None = None,
     regime_factory: Callable[[], list[RegimeBase]] = default_regimes,
+    chatty: int = 0,
 ) -> dict[str, RegimeMetrics]:
     active_model: Model = model if model is not None else ScriptedModel()
     runs = []
     for seed in seeds:
-        scenario = generate(seed, n_turns=n_turns)
+        scenario = generate(seed, n_turns=n_turns, chatty=chatty)
         runs.append(run_scenario(scenario, regime_factory(), active_model))
     return merge(runs)
 

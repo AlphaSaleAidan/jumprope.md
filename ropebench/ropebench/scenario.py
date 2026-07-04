@@ -37,6 +37,36 @@ FILLER_OBJS = ["helper utilities", "import blocks", "test fixtures", "log string
 SHORT, MEDIUM, LONG = "short", "medium", "long"
 _DISTANCES = {SHORT: (2, 5), MEDIUM: (12, 25), LONG: (35, 60)}
 
+# Conversational padding for the "chatty" scenario — real sessions wrap each
+# fact in filler. The distinctive value survives verbatim; full-history pays
+# for the padding, the rope's densify strips most of it (this is what makes
+# unbound mode's economics real — the B5 gap in ROADMAP).
+_CHATTER_PRE = [
+    "Okay so I was just looking at this and honestly it seems like",
+    "Right, quick heads up before we move on —",
+    "Hmm, let me make sure I note this down properly:",
+    "Good question. After digging through the code it turns out that",
+    "So to summarize where we landed after all that back and forth,",
+]
+_CHATTER_POST = [
+    "but let me know if you'd rather approach it differently.",
+    "does that line up with what you were expecting on your end?",
+    "anyway, moving on to the next thing on the list now.",
+    "I'll keep that in mind as we continue with the rest of the work.",
+    "figured it was worth flagging explicitly so we don't lose it later.",
+]
+
+
+def _chattify(text: str, rng: random.Random, padding: int) -> str:
+    """Wrap ``text`` in ``padding`` sentences of conversational filler."""
+    parts: list[str] = []
+    for _ in range(padding):
+        parts.append(rng.choice(_CHATTER_PRE))
+    parts.append(text)
+    for _ in range(padding):
+        parts.append(rng.choice(_CHATTER_POST))
+    return " ".join(parts)
+
 
 @dataclass(frozen=True)
 class Event:
@@ -81,7 +111,7 @@ class Scenario:
         return [p for p in self.probes if p.turn == turn]
 
 
-def generate(seed: int, n_turns: int = 80) -> Scenario:
+def generate(seed: int, n_turns: int = 80, chatty: int = 0) -> Scenario:
     rng = random.Random(seed)
     adjectives = rng.sample(ADJECTIVES, 14)
     nouns = rng.sample(NOUNS, 14)
@@ -106,6 +136,8 @@ def generate(seed: int, n_turns: int = 80) -> Scenario:
         value = f"{CHOICES[i % 8].split('-')[0]}-{rng.randint(1000, 9999)}"
         ref_turn = min(2 + i * fact_step, n_turns - 1)
         text = f"the {adj} {noun} pipeline is pinned to build {value} until further notice"
+        if chatty:
+            text = _chattify(text, rng, chatty)
         section = "delta" if i % 2 == 0 else "open"
         kwargs: dict[str, object] = (
             {"path": f"svc/{noun}.py"} if section == "delta" else {"priority": 2}
@@ -126,6 +158,8 @@ def generate(seed: int, n_turns: int = 80) -> Scenario:
         ref_turn = min(4 + i * decision_step, n_turns - 1)
         text = (f"decided to adopt {choice} for the {noun} layer "
                 f"because of {reason} constraints")
+        if chatty:
+            text = _chattify(text, rng, chatty)
         turns[ref_turn - 1].append(
             Event(kind="decision", text=text, rope_section="decision",
                   rope_kwargs={"reason": reason})
