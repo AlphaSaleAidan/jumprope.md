@@ -23,13 +23,17 @@ from .scenario import Event, Probe, Scenario
 
 # Distinctive value shapes worth asking about later: they are specific,
 # unlikely to be guessed, and cheap to score by exact match.
+# Ordered most-specific first; each match claims its span so a later, broader
+# pattern cannot re-mine the same characters (avoids a hash also matching the
+# generic-hex rule, or "3.10.4" also yielding "10.4").
 _VALUE_PATTERNS = [
-    re.compile(r"\bport\s+(\d{2,5})\b", re.I),
     re.compile(r"\b(tv-[0-9a-f]{8,})\b"),
-    re.compile(r"\b([A-Z][A-Z0-9_]{4,}_[A-Z0-9_]{2,})\b"),  # ENV_STYLE_FLAGS
-    re.compile(r"\b(?:PR|issue|#)\s*#?(\d{2,5})\b"),
-    re.compile(r"\b([0-9a-f]{7,40})\b"),  # git shas
-    re.compile(r"\b(\d{2,4}(?:\.\d{1,3}){1,3})\b"),  # versions / ports / ips
+    re.compile(r"\b([A-Z][A-Z0-9]{2,}_[A-Z0-9_]{2,})\b"),  # ENV_STYLE_FLAGS
+    re.compile(r"\bport\s+(\d{2,5})\b", re.I),
+    re.compile(r"\b(?:PR|issue)\s*#?(\d{2,5})\b", re.I),
+    re.compile(r"#(\d{2,5})\b"),
+    re.compile(r"\bv?(\d+\.\d+\.\d+(?:\.\d+)?)\b"),  # semantic versions
+    re.compile(r"\b([0-9a-f]{7,40})\b"),  # bare git shas
     re.compile(r"`([a-z][a-z0-9_\-/]{4,}\.[a-z]{1,4})`"),  # file paths in ticks
 ]
 _STOPVALUES = {"http", "https", "20", "200", "404", "100", "000"}
@@ -71,11 +75,16 @@ class LoadedTranscript:
 
 def _extract_values(text: str) -> set[str]:
     values: set[str] = set()
+    claimed: list[tuple[int, int]] = []  # spans already taken by a better pattern
     for pattern in _VALUE_PATTERNS:
         for match in pattern.finditer(text):
+            lo, hi = match.span(1)
+            if any(lo < c_hi and hi > c_lo for c_lo, c_hi in claimed):
+                continue  # overlaps an already-mined, more specific value
             val = match.group(1)
             if val.lower() not in _STOPVALUES and len(val) >= 2:
                 values.add(val)
+                claimed.append((lo, hi))
     return values
 
 
