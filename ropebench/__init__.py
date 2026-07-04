@@ -21,11 +21,16 @@ from .regimes import (
 from .report import csv_rows, markdown
 from .runner import RegimeMetrics, run_benchmark, run_scenario
 from .scenario import Event, Probe, Scenario, generate
+from .transcript import LoadedTranscript, TranscriptStats
+from .transcript import load as load_transcript
 
 __version__ = "0.1.0"
 
 __all__ = [
     "Event",
+    "LoadedTranscript",
+    "TranscriptStats",
+    "load_transcript",
     "FullHistoryRegime",
     "ModelAnswer",
     "OpenAICompatModel",
