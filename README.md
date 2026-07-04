@@ -266,15 +266,30 @@ just expensive on a real long session; it is impossible.
 An autonomous research loop is testing independent predictions of the theory.
 The first: **the memory hierarchy's payoff grows with session length**.
 Carry-everything's cost grows O(n¹·³⁴) (every turn pays for all prior turns);
-the rope's grows O(n⁰·⁷³). By 260 turns the rope is **4.5× cheaper**. Four more
+the rope's grows O(n⁰·⁷³). By 260 turns the rope is **4.5× cheaper**. Five more
 confirmed sub-theories (density has a floor, structure beats a flat blob, tighter
-budgets win, and the rope is noise-robust) are in `ropebench/THEORY.md`.
+budgets win, the rope is noise-robust, and exact addressing beats semantic search
+under distractors) are in `ropebench/THEORY.md`.
 
 <p align="center"><img src="assets/chart-noise.svg" width="900" alt="accuracy vs conversational filler — the rope degrades gracefully while truncate and summarize collapse"></p>
 
 The chattier the session, the more the rope pulls ahead: at 16× filler it holds
 44% while truncate and summarize collapse to 16% — the rope's margin over the
 strategies frameworks actually ship *widens* with real-world noise.
+
+<p align="center"><img src="assets/chart-distractors.svg" width="900" alt="recall of a specific fact as near-duplicate distractors flood the store — exact addressing stays 100% while semantic search collapses"></p>
+
+And why does *structure* beat a flat dense blob? Because it makes an old fact
+**addressable**. Flood the store with near-duplicate facts (same sentence,
+different value) and ask for one back: pure semantic search collapses from 100%
+to 0% as the near-duplicates crowd in — the one distinctive token drowns, so the
+nearest-neighbour rank is no better than chance. The rope stamps every archived
+fact with an exact `KEYS` handle and fetches it by key: **100%, no matter how
+crowded the store gets.** Writing the rope in an **AI-native language makes this
+stronger** — denser coding strips even more surface variance, so semantic search
+fails *faster* (48%→33% at four distractors) while the exact fetch is unmoved.
+That is the counter-intuitive punchline: the denser and more coded your memory,
+the *more* you need to address it by key instead of searching it by meaning.
 
 ---
 

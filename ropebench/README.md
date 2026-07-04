@@ -31,13 +31,13 @@ reference implementation), and **rope-unbound / streaming**.
 
 Auto-summarization is the industry default. It is also the worst performer on
 exactly the thing you ask about later. Scored by **fact age** (when a fact was
-introduced), scripted reader, 5 seeds:
+introduced), scripted reader, 20 seeds (n=600):
 
 | fact age | n | summary recall | rope recall | difference | 95% CI |
 |---|---|---|---|---|---|
-| **early** (oldest) | 65 | 74% | 94% | **−20.0%** | [−32.3%, −7.7%] |
-| **mid** | 70 | 61% | 91% | **−30.0%** | [−42.9%, −17.1%] |
-| **late** (recent) | 15 | 100% | 100% | +0.0% | [0%, 0%] |
+| **early** (oldest) | 260 | 72% | 95% | **−22.7%** | [−28.5%, −16.9%] |
+| **mid** | 280 | 67% | 92% | **−25.4%** | [−31.8%, −18.9%] |
+| **late** (recent) | 60 | 100% | 100% | +0.0% | [0%, 0%] |
 
 The damage is real and significant (both CIs clear zero) and it is
 **concentrated in old facts** — recent facts are untouched. This is the effect
@@ -93,6 +93,42 @@ is **29% of full-history**; on a filler-free stream it *loses* (nothing to
 evict) — reported honestly, not hidden. `CLAIMS.md` C8, `tests/test_b6.py`.
 
 ---
+
+## Findings from ongoing research
+
+Beyond the four headline findings, an autonomous research loop tests independent
+sub-theories of the core claim. Confirmed so far (each with a regression test in
+`tests/test_theory_*.py`, full writeup in [THEORY.md](THEORY.md)):
+
+- **T1 — value grows with session length.** Full-history cost O(n^1.34), rope
+  O(n^0.73); the rope's advantage grows O(n^0.61) — 4.5× cheaper at 260 turns.
+- **T2 — density has a floor.** Over-aggressive dictionary coding (ai-native)
+  drops a literal reader's recall 93%→82% by coding away matchable context words.
+- **T3 — structure beats a flat dense blob.** Same budget/retrieval, only
+  structure differs: 96% vs 62% at long distance — structure's whole value is
+  in old facts.
+- **T4 — tighter is better (counterintuitive).** Efficiency is maximized at the
+  *smallest* satisfiable budget (25.3 @ 400 tok vs 5.6 @ 3600) — a smaller rope
+  forces retrieval and the vault compensates.
+- **T7 — exact addressing survives distractors; semantic search collapses.**
+  Flood the store with near-duplicate facts (same wording, different value) and
+  ask for one back: flat semantic recall falls 100%→0% as N grows 0→64 (it
+  tracks — and undershoots — the `k/(N+1)` chance line), while the rope's
+  turn-stamped KEYS handle is an *exact* content-addressed fetch and stays
+  **100% at every N**. This is the mechanism behind T3: structure wins because it
+  makes old facts *addressable*. **Writing the rope in an AI-native language makes
+  this stronger** — denser coding removes even more surface variance, so semantic
+  search on the coded near-duplicates fails *faster* (48%→33% at N=4), widening a
+  gap the exact fetch already owns. It also resolves T2's tension: aggressive
+  AI-native coding is safe *on the retrieval tier* precisely because retrieval
+  there is exact, not fuzzy.
+- **T8 — the rope is noise-robust and its margin widens with filler.** As
+  conversational filler grows, lossy baselines collapse (truncate/summary 16% at
+  16× filler) while the rope degrades gracefully (44%); the rope−truncate margin
+  grows 7pt→28pt.
+
+The statistics themselves are validated: over 100k simulated experiments the
+bootstrap 95% CI covers the true value ~95% of the time.
 
 ## How it works
 
