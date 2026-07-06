@@ -220,3 +220,57 @@ recall is never distinctive, it's "which of the 40 `close()` did I mean?", which
 is Part A, where semantic fails and the address wins. Shipped
 `test_theory_t9.py`, `research/exp_t9_codescale.py`, `results/t9-codescale/`,
 `assets/chart-codescale.svg`.
+
+### Entry 10 — T10: the missing link (scribe fidelity) measured LIVE (2026-07-06)
+
+Every prior number assumed PERFECT CAPTURE: `RopeRegime._record` applies the
+generator's own event mapping — the harness never had to *notice* a fact.
+Production has no such oracle; a live model must decide, mid-stream, what is
+durable. The system is a chain — **end-to-end = capture × carry × recall** —
+and capture was the unmeasured factor. If capture is weak, everything above
+is the ceiling of a system nobody runs.
+
+**Protocol** (`research/exp_t10_scribe.py`): chatty scenario (facts wrapped in
+conversational filler + routine-churn noise every turn), 2 seeds × 40 turns,
+n=60 probes/condition. A live Haiku scribe sees each turn's raw transcript +
+current rope and emits ledger ops (JSON lines) or NONE; ops flow through the
+same `JumpingRopeSession` as the mechanical regime. All conditions answered
+by the SAME deterministic ScriptedModel, so any delta vs mech-rope is capture
+alone. `--scribe perfect` replays the oracle mapping through the same pipe
+and reproduces mech-rope — the harness validates before any paid call.
+
+| condition | acc | capture | capture-losses | recall-losses |
+|---|---|---|---|---|
+| **scribe-rope (live Haiku captures)** | **83%** | **100%** | **0** | 10 |
+| mech-rope (oracle captures) | 77% | 98% | 1 | 13 |
+| summary | 57% | 62% | 23 | 3 |
+
+Paired bootstrap (10k, seeded):
+- scribe-rope vs summary: **+26.7% [+13.3%, +40.0%] — CI clears zero.**
+- scribe-rope vs mech-rope: +6.7% [−5.0%, +18.3%] — **parity** (the small edge
+  is structural: the scribe files facts as OPEN, the oracle alternates
+  DELTA/OPEN; not scribe magic).
+
+**The scribe was surgical:** 66 valid ops for exactly the stream's 66 durable
+events, **0 ops on filler-only turns** (nothing logged for renames/linting/
+tidying churn), identifiers copied verbatim. The run's 41 "unparseable lines"
+were audited: markdown code fences around otherwise-perfect JSON (parser
+counted the wrappers; fixed post-run — cosmetic, zero ops lost).
+
+**Integrity check on the metric itself:** `note_turn` is accounting-only
+(verified in session.py) — raw turn text is never archived to the vault, so
+100% capture cannot be a harness leak; only scribe ops put values in reach.
+
+**Honest limits.** n=60, 2 seeds, one model, one scribe prompt. The scenario's
+facts are *salient* — one-sentence declarations wrapped in filler, and the
+scribe prompt's op taxonomy matches the generator's event taxonomy. This
+proves capture is NOT the weak link for conversational facts a session
+states in prose. It does NOT yet cover the harder capture class: values that
+only ever appear inside tool output (a port in a stack trace, a hash in a
+diff) that no one restates. That is T11 — unsalient capture — and it is the
+next place the theory could break.
+
+**Verdict: the chain closes** for salient facts. With a live model doing the
+capturing, carrying, and (scripted) recalling, the full system holds its
++26.7pt lead over the summarization every framework ships — and loses
+nothing measurable to the oracle scribe.
