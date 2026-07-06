@@ -255,8 +255,9 @@ more than tokens do.
 | Beats lossy baselines on old facts, cheaper than the ceiling | — | 100% vs 67/24, at 53% cost (bound) | pass |
 | A cold session can recover vaulted facts through the index | ≥19/20 | 20/20 | pass |
 | A live LLM keeps ≥90% of its ceiling accuracy on the rope | ≥90% | **100% — equals the ceiling** (Haiku, 3 seeds × 80 turns), at 54% of its tokens, 0 hallucinated answers | pass |
+| A live model doing its **own capture** (no oracle deciding what to log) keeps the lead | untested — the missing link | **100% capture (60/60), zero noise ops; +26.7% vs auto-summarize [+13.3%, +40.0%]; parity with oracle capture** (T10, Haiku scribe, chatty stream) | pass |
 
-The last row is the live-model run (Haiku 4.5, 390 probe calls): the model
+The live-model run (Haiku 4.5, 390 probe calls): the model
 on the bound rope was **indistinguishable from the same model carrying the
 full transcript** — and it beat the deterministic reader, because a real
 model composes better vault queries than literal keyword matching. It used
@@ -266,6 +267,18 @@ adapters measure 17–18% there); under this benchmark's pay-every-turn cost
 model the correct number is **54% of the oracle's bill at equal accuracy**.
 The lossy baselines got *worse* live: auto-summarize fell to 14% on old
 facts — a real model cannot reconstruct what summaries destroyed.
+
+**And the last row closes the loop end-to-end.** Every earlier number
+assumed something no deployment has: an oracle telling the system what was
+worth remembering. T10 (`ropebench/research/exp_t10_scribe.py`) removed it —
+a live model read each raw, filler-wrapped turn and decided *itself* what to
+log. It captured **every probed fact (60/60), logged nothing for the churn,
+copied identifiers verbatim**, and the full live-capture system still beat
+auto-summarize by 26.7 points (CI clears zero) while matching the
+oracle-capture upper bound. Scope stated honestly: salient conversational
+facts, one model, n=60 — facts that only appear inside tool output (a port
+in a stack trace) are the next test (T11, in the
+[roadmap](ropebench/ROADMAP.md)).
 
 ---
 
