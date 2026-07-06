@@ -158,9 +158,10 @@ probed facts), zero noise ops on filler-only turns, end-to-end +26.7%
 capture.** The chain (capture x carry x recall) closes for salient
 conversational facts. JOURNAL Entry 11; claim C19.
 
-**Next (T11 — unsalient capture):** the untested capture class is values
-that only ever appear inside tool output (a port in a stack trace, a hash
-in a diff) and are never restated in prose. Extend the scenario with
-tool-output events whose ground truth appears only in a machine blob, and
-measure whether the scribe still catches them. This is the most likely
-place for the theory to break next.
+**T11 — unsalient capture ✅ (measured 2026-07-06):** the boundary is real —
+unhinted scribes capture 81% of blob-buried values (p99-in-log-tail the
+weak class); one prompt rule lifts it to 88% but the failure moves
+(JOURNAL Entry 12, C20). **Next: mechanical capture hooks** — auto-log
+values from tool output (PostToolUse-style) so blob-buried facts never
+depend on scribe attention at all. That closes the last capture gap by
+construction.

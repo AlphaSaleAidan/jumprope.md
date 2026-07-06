@@ -305,3 +305,43 @@ next place the theory could break.
 capturing, carrying, and (scripted) recalling, the full system holds its
 +26.7pt lead over the summarization every framework ships — and loses
 nothing measurable to the oracle scribe.
+
+### Entry 12 — T11: the capture boundary FOUND, then half-fixed (2026-07-06)
+
+T10 left one door open: facts that never get said in prose. T11 planted 8
+values per seed that exist ONLY inside machine blobs — a port in a
+traceback, a sha256 in a diff hunk, max_retries in a config dump, a p99 in
+a log tail — with a one-line prose intro that never contains the value.
+Same scribe prompt as T10, zero hints. **Pre-registered prediction:
+capture drops below 100%. Confirmed.**
+
+| tool-facts only (n=16) | acc | capture |
+|---|---|---|
+| scribe (unhinted) | 75% | **81%** |
+| scribe + one hint rule (T11b) | 88% | **88%** |
+| oracle capture | 100% | 100% |
+| summary | **0%** | 38% |
+
+- Unhinted deficit vs oracle: −25% [−50%, −6%] — real even at n=16. The
+  weak class: **p99 buried in a log tail (2/4)** — a WARN line among INFO
+  noise reads as churn. Configs and diffs survived (8/8).
+- **T11b — the cheapest fix measured:** ONE added rule ("blobs often hold
+  the only copy of a value — log it verbatim"). p99 class fully fixed
+  (4/4), but ports regressed (3/4→2/4): the failure MOVED. Net +12.5%
+  [−12.5%, +37.5%] — parity by CI at this n. Honest read: prompting shifts
+  which class gets skimmed; the complete answer is **mechanical capture**
+  (hooks that auto-log values from tool output), now the top roadmap item.
+  The hint ships anyway (harmless, fixed the worst class): SKILL.md and
+  the /jumprope-start operating loop now carry it.
+- Summarization on blob-buried facts: **0%. Zero.** Every value it ever
+  saw is unrecoverable. This is the sharpest separation measured yet.
+- Ops audit: clean runs emit ~40 ops/40 turns, 0 noise ops, 0 parse
+  failures. (A first hinted run collapsed to 3% — diagnosed as
+  environmental: its 80 CLI calls coincided with a host session restart;
+  a manual reproduction of the same call was perfect. CommandScribe now
+  writes a raw-reply audit log so this class of anomaly is diagnosable
+  from the artifact alone.)
+
+**Verdict: the theory's honest boundary is the scribe's eye for buried
+values — 4-in-5 unhinted, ~9-in-10 hinted, 10-in-10 only with mechanical
+capture. Nothing else in the chain broke.**

@@ -132,16 +132,20 @@ class CommandScribe:
 
     name = "command"
 
-    def __init__(self, argv: list[str], timeout_s: int = 120) -> None:
+    def __init__(self, argv: list[str], timeout_s: int = 120,
+                 prompt_template: str = SCRIBE_PROMPT,
+                 raw_log: Path | None = None) -> None:
         self.argv = argv
         self.timeout_s = timeout_s
+        self.prompt_template = prompt_template
+        self.raw_log = raw_log  # audit trail: every raw model reply
         self.calls = 0
         self.parse_failures = 0
 
     def ops_for_turn(self, events: list[Event], rope_render: str) -> list[dict]:
         turn_text = " ".join(e.text for e in events)
-        prompt = SCRIBE_PROMPT % {"rope": rope_render or "(empty)",
-                                  "turn": turn_text}
+        prompt = self.prompt_template % {"rope": rope_render or "(empty)",
+                                         "turn": turn_text}
         self.calls += 1
         try:
             proc = subprocess.run(self.argv, input=prompt, capture_output=True,
@@ -149,6 +153,9 @@ class CommandScribe:
             raw = proc.stdout.strip()
         except subprocess.TimeoutExpired:
             raw = ""
+        if self.raw_log is not None:
+            with self.raw_log.open("a", encoding="utf-8") as fh:
+                fh.write(f"--- call {self.calls}\n{raw}\n")
         ops: list[dict] = []
         for line in raw.splitlines():
             line = line.strip()

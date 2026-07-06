@@ -119,4 +119,9 @@ P1 race condition to resolve, and the kickoff scope is retrievable with
   `→` for causality, glyphs for status.
 - Record decisions WITH reasons at the moment they are made. Future-you
   cannot reconstruct a reason from the transcript — it will be gone.
+- Tool output (tracebacks, diffs, config dumps, log tails) often holds
+  the ONLY copy of a critical value — a port, a digest, a threshold, a
+  latency. Log such values as facts VERBATIM even when the surrounding
+  output looks routine: measured, an unhinted scribe skims past ~1 in 5
+  of them (ropebench T11), and summarization recovers none of them.
 - Never paste secrets into the rope. It is a plain file on disk.
