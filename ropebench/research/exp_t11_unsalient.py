@@ -42,11 +42,6 @@ import random
 import shlex
 from pathlib import Path
 
-from ropebench.models import ScriptedModel
-from ropebench.pricing import enforce_budget, estimate_cost
-from ropebench.regimes import RopeRegime, SummaryRegime
-from ropebench.scenario import Event, Probe, Scenario, generate
-
 from research.exp_t10_scribe import (
     SCRIBE_PROMPT,
     CommandScribe,
@@ -56,6 +51,10 @@ from research.exp_t10_scribe import (
     _captured,
     _hit,
 )
+from ropebench.models import ScriptedModel
+from ropebench.pricing import enforce_budget, estimate_cost
+from ropebench.regimes import RopeRegime, SummaryRegime
+from ropebench.scenario import Event, Probe, Scenario, generate
 
 # The candidate fix for the T11 capture gap: ONE added rule (--hint). If this
 # recovers tool-fact capture, it ships in the skill prompt; if not, the fix
