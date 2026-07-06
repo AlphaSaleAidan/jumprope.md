@@ -13,8 +13,21 @@ Wire it up (settings.json):
         "command": "python3 /abs/path/adapters/claude-statusline/statusline.py" } }
 
 Claude Code pipes session JSON on stdin; we use it to find the rope for the
-current workspace. Override the rope path with JROPE_ROPE_PATH, the budget with
-JROPE_BUDGET (default 2000; ignored in unbound mode).
+current workspace. When the per-session convention is in use
+(`.claude/jumprope/sessions/<session_id>/ROPE.md`, as created by the
+`/jumprope-start` command from adapters/claude-commands), each session sees
+only its own rope — concurrent sessions never share a gauge. Otherwise the
+freshest ROPE.md under the workspace is used, as before.
+
+Config, lowest to highest precedence: built-in defaults, an `env` file of
+KEY=VALUE lines next to the rope (`.claude/jumprope/env` and the session
+dir's `env`), then real environment variables:
+
+  JROPE_ROPE_PATH  force a specific rope file
+  JROPE_BUDGET     bound-mode token budget (default 2000)
+  JROPE_MODE       "unbound" for the ∞ readout (default bound)
+  JROPE_EMOJI      gauge glyph (default 🪢)
+  JROPE_ANIMATE    "0" disables the rope-swing animation (default on)
 """
 
 from __future__ import annotations
@@ -28,6 +41,11 @@ import time
 
 BAR_W = 14
 FILLED, EMPTY = "█", "░"
+# rotating stroke = the rope whipping around; refreshes only happen while
+# the session is active, so the rope visibly spins while working
+SPIN = "|/─\\"
+DEFAULTS = {"JROPE_BUDGET": "2000", "JROPE_MODE": "bound",
+            "JROPE_EMOJI": "🪢", "JROPE_ANIMATE": "1"}
 
 
 def _read_stdin_json() -> dict:
@@ -40,13 +58,24 @@ def _read_stdin_json() -> dict:
 
 def _cwd(info: dict) -> str:
     ws = info.get("workspace") or {}
-    return (ws.get("current_dir") or info.get("cwd") or os.getcwd())
+    return (ws.get("project_dir") or ws.get("current_dir")
+            or info.get("cwd") or os.getcwd())
 
 
-def _find_rope(cwd: str) -> str | None:
+def _sessions_root(cwd: str) -> str:
+    return os.path.join(cwd, ".claude", "jumprope", "sessions")
+
+
+def _find_rope(cwd: str, session_id: str | None = None) -> str | None:
     override = os.environ.get("JROPE_ROPE_PATH")
     if override and os.path.exists(override):
         return override
+    if session_id:
+        scoped = os.path.join(_sessions_root(cwd), session_id, "ROPE.md")
+        if os.path.isfile(scoped):
+            return scoped
+    if os.path.isdir(_sessions_root(cwd)):
+        return None  # per-session convention active: never show another session's rope
     candidates: list[str] = []
     for pat in ("ROPE.md", ".jumprope/**/ROPE.md", ".claude/jumprope/**/ROPE.md",
                 ".jumprope/ROPE.md", "**/ROPE.md"):
@@ -57,14 +86,38 @@ def _find_rope(cwd: str) -> str | None:
     return max(candidates, key=os.path.getmtime)  # freshest rope
 
 
+def _file_cfg(cwd: str, session_id: str | None) -> dict[str, str]:
+    """KEY=VALUE `env` files: repo-wide, then per-session (later wins)."""
+    cfg: dict[str, str] = {}
+    paths = [os.path.join(cwd, ".claude", "jumprope", "env")]
+    if session_id:
+        paths.append(os.path.join(_sessions_root(cwd), session_id, "env"))
+    for path in paths:
+        if not os.path.isfile(path):
+            continue
+        try:
+            for ln in open(path, encoding="utf-8"):
+                ln = ln.strip()
+                if ln and not ln.startswith("#") and "=" in ln:
+                    key, val = ln.split("=", 1)
+                    cfg[key.strip()] = val.strip()
+        except OSError:
+            pass
+    return cfg
+
+
+def _opt(name: str, cfg: dict[str, str]) -> str:
+    return os.environ.get(name) or cfg.get(name) or DEFAULTS[name]
+
+
 def _est_tokens(text: str) -> int:
     # cheap, dependency-free estimate (~4 chars/token) — good enough for a gauge.
     return max(1, round(len(text) / 4))
 
 
-def _parse_meta(text: str) -> tuple[int, bool]:
-    """Return (jump_count, unbound) sniffed from the rope header if present."""
-    jumps, unbound = 0, False
+def _parse_meta(text: str) -> int:
+    """Return the jump count sniffed from the rope header if present."""
+    jumps = 0
     first = text.split("\n", 1)[0]
     for tok in first.replace("|", " ").split():
         if tok.startswith("j:"):
@@ -72,8 +125,7 @@ def _parse_meta(text: str) -> tuple[int, bool]:
                 jumps = int(tok[2:])
             except ValueError:
                 pass
-    unbound = os.environ.get("JROPE_MODE", "").lower() == "unbound"
-    return jumps, unbound
+    return jumps
 
 
 def _lerp(a, b, t):
@@ -113,16 +165,26 @@ def _human(n: int) -> str:
 
 def render(info: dict, now: float | None = None) -> str:
     now = time.time() if now is None else now
-    rope = _find_rope(_cwd(info))
+    cwd = _cwd(info)
+    sid = info.get("session_id")
+    cfg = _file_cfg(cwd, sid)
+    emoji = _opt("JROPE_EMOJI", cfg)
+    animate = _opt("JROPE_ANIMATE", cfg) != "0"
+
+    rope = _find_rope(cwd, sid)
     if rope is None:
-        return f"{DIM}🪢 no rope yet{RESET}"
+        hint = ("no rope — /jumprope-start"
+                if os.path.isdir(_sessions_root(cwd)) else "no rope yet")
+        return f"{DIM}{emoji} {hint}{RESET}"
     try:
         text = open(rope, encoding="utf-8", errors="ignore").read()
     except OSError:
-        return f"{DIM}🪢 rope unreadable{RESET}"
+        return f"{DIM}{emoji} rope unreadable{RESET}"
     tokens = _est_tokens(text)
-    jumps, unbound = _parse_meta(text)
-    budget = int(os.environ.get("JROPE_BUDGET", "2000"))
+    jumps = _parse_meta(text)
+    unbound = _opt("JROPE_MODE", cfg).lower() == "unbound"
+    budget = int(_opt("JROPE_BUDGET", cfg))
+    knot = emoji + (SPIN[int(now * 8) % len(SPIN)] if animate else "")
 
     if unbound:
         # no ceiling — scale color by absolute size tiers, gentle pulse
@@ -130,7 +192,7 @@ def render(info: dict, now: float | None = None) -> str:
         base = _fill_color(fill)
         b = _pulse(fill * 0.6, now)
         col = _ansi(tuple(round(c * b) for c in base))
-        return (f"{col}🪢 {_human(tokens)} tok ∞{RESET} "
+        return (f"{col}{knot} {_human(tokens)} tok ∞{RESET} "
                 f"{DIM}unbound · j{jumps}{RESET}")
 
     fill = tokens / budget
@@ -141,7 +203,7 @@ def render(info: dict, now: float | None = None) -> str:
     bar = col + FILLED * filled + DIM + EMPTY * (BAR_W - filled) + RESET
     over = f" {_ansi((239,68,68))}JUMP!{RESET}" if fill >= 1.0 else ""
     pct = f"{col}{min(fill,1.0)*100:.0f}%{RESET}"
-    return (f"🪢 {bar} {col}{_human(tokens)}{RESET}{DIM}/{_human(budget)}{RESET} "
+    return (f"{knot} {bar} {col}{_human(tokens)}{RESET}{DIM}/{_human(budget)}{RESET} "
             f"{pct}{over} {DIM}j{jumps}{RESET}")
 
 

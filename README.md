@@ -112,6 +112,7 @@ to avoid.
 | **The vault + `jrope query`** | any "what was that detail from earlier?" moment — exact-key or semantic lookup instead of scrolling |
 | **Turn provenance (`t42·` stamps)** | auditing: every vaulted item's K-line tells you which conversation turn produced it |
 | **Claude Code skill** | long coding sessions in Claude Code — maintains ROPE.md automatically, re-seeds after compaction |
+| **Statusline gauge + `/jumprope-*` commands** | watch the rope fill live in the Claude Code status line (the rope spins while the session works); `/jumprope-start`, `/jumprope-cut`, `/jumprope-mode`, `/jumprope-status` manage one rope **per session** |
 | **Open WebUI pipe** | self-hosted chat UIs — paste one file, get streaming eviction per conversation |
 | **OpenAI-compatible proxy** | any existing stack (middleware): point the client at the proxy, sessions get ropes transparently |
 
