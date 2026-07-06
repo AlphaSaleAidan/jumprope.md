@@ -44,8 +44,41 @@ FILLED, EMPTY = "█", "░"
 # rotating stroke = the rope whipping around; refreshes only happen while
 # the session is active, so the rope visibly spins while working
 SPIN = "|/─\\"
+_BRAILLE_BITS = {(0, 0): 1, (0, 1): 2, (0, 2): 4, (1, 0): 8,
+                 (1, 1): 16, (1, 2): 32, (0, 3): 64, (1, 3): 128}
+
+
+def _rope_frames(n: int = 12, w: int = 8, h: int = 4,
+                 amp: float = 2.4) -> tuple[str, ...]:
+    """JROPE_STYLE=drawn: a custom-drawn rope, no holder.
+
+    Braille chars are 2x4 pixel grids, so 4 chars give an 8x4 canvas. Each
+    frame plots the rope's curve y = sin(pi*x/w)*cos(theta) — the front view
+    of a real jump-rope swing: arc over the top, whip past level, arc under
+    the feet, back past level. Adjacent columns are connected so the rope
+    stays one continuous line.
+    """
+    frames = []
+    mid = (h - 1) / 2
+    for k in range(n):
+        theta = 2 * math.pi * k / n
+        ys = [min(h - 1, max(0, round(
+            mid - amp * math.sin(math.pi * (x + 0.5) / w) * math.cos(theta))))
+            for x in range(w)]
+        cells = [0] * (w // 2)
+        for x in range(w):
+            lo = ys[x] if x == 0 else min(ys[x - 1], ys[x])
+            hi = ys[x] if x == 0 else max(ys[x - 1], ys[x])
+            for y in range(lo, hi + 1):
+                cells[x // 2] |= _BRAILLE_BITS[(x % 2, y)]
+        frames.append("".join(chr(0x2800 + c) for c in cells))
+    return tuple(frames)
+
+
+ROPE_FRAMES = _rope_frames()
+ROPE_SLACK = "⣀⣀⣀⣀"  # limp rope on the ground: nothing is swinging it yet
 DEFAULTS = {"JROPE_BUDGET": "2000", "JROPE_MODE": "bound",
-            "JROPE_EMOJI": "🪢", "JROPE_ANIMATE": "1"}
+            "JROPE_EMOJI": "🪢", "JROPE_ANIMATE": "1", "JROPE_STYLE": "emoji"}
 
 
 def _read_stdin_json() -> dict:
@@ -170,21 +203,30 @@ def render(info: dict, now: float | None = None) -> str:
     cfg = _file_cfg(cwd, sid)
     emoji = _opt("JROPE_EMOJI", cfg)
     animate = _opt("JROPE_ANIMATE", cfg) != "0"
+    drawn = _opt("JROPE_STYLE", cfg).lower() == "drawn"
+    idle = ROPE_SLACK if drawn else emoji
+
+    def lead(col: str) -> str:
+        """The gauge glyph: emoji+stroke, or the drawn rope mid-swing."""
+        if drawn:
+            frame = ROPE_FRAMES[int(now * 12) % len(ROPE_FRAMES)] if animate \
+                else ROPE_FRAMES[0]
+            return f"{col}{frame}{RESET}"
+        return emoji + (SPIN[int(now * 8) % len(SPIN)] if animate else "")
 
     rope = _find_rope(cwd, sid)
     if rope is None:
         hint = ("no rope — /jumprope-start"
                 if os.path.isdir(_sessions_root(cwd)) else "no rope yet")
-        return f"{DIM}{emoji} {hint}{RESET}"
+        return f"{DIM}{idle} {hint}{RESET}"
     try:
         text = open(rope, encoding="utf-8", errors="ignore").read()
     except OSError:
-        return f"{DIM}{emoji} rope unreadable{RESET}"
+        return f"{DIM}{idle} rope unreadable{RESET}"
     tokens = _est_tokens(text)
     jumps = _parse_meta(text)
     unbound = _opt("JROPE_MODE", cfg).lower() == "unbound"
     budget = int(_opt("JROPE_BUDGET", cfg))
-    knot = emoji + (SPIN[int(now * 8) % len(SPIN)] if animate else "")
 
     if unbound:
         # no ceiling — scale color by absolute size tiers, gentle pulse
@@ -192,7 +234,7 @@ def render(info: dict, now: float | None = None) -> str:
         base = _fill_color(fill)
         b = _pulse(fill * 0.6, now)
         col = _ansi(tuple(round(c * b) for c in base))
-        return (f"{col}{knot} {_human(tokens)} tok ∞{RESET} "
+        return (f"{lead(col)}{col} {_human(tokens)} tok ∞{RESET} "
                 f"{DIM}unbound · j{jumps}{RESET}")
 
     fill = tokens / budget
@@ -203,7 +245,7 @@ def render(info: dict, now: float | None = None) -> str:
     bar = col + FILLED * filled + DIM + EMPTY * (BAR_W - filled) + RESET
     over = f" {_ansi((239,68,68))}JUMP!{RESET}" if fill >= 1.0 else ""
     pct = f"{col}{min(fill,1.0)*100:.0f}%{RESET}"
-    return (f"{knot} {bar} {col}{_human(tokens)}{RESET}{DIM}/{_human(budget)}{RESET} "
+    return (f"{lead(col)} {bar} {col}{_human(tokens)}{RESET}{DIM}/{_human(budget)}{RESET} "
             f"{pct}{over} {DIM}j{jumps}{RESET}")
 
 
