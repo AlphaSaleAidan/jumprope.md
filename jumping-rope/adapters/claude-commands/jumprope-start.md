@@ -42,5 +42,9 @@ From now on in this session, follow the jumping-rope operating loop: after
 every meaningful change (edit, decision, discovered fact, blocker, completed
 goal) log it to the rope immediately with `rope_ops.py log`; before/after any
 compaction run `rope_ops.py jump` and re-seed from the printed rope alone.
+Watch tool output: tracebacks, diffs, config dumps and log tails often
+hold the ONLY copy of a critical value (port, digest, threshold,
+latency) — log those values verbatim; an unhinted scribe skims past
+~1 in 5 of them (ropebench T11).
 When JROPE_MODE=unbound, pass `--budget 999999` to log/jump calls so nothing
 is demoted; when bound, always pass the env's `JROPE_BUDGET`.
