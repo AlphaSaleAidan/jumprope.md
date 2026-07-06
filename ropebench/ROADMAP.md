@@ -147,3 +147,20 @@ one external-model live sweep reproduced by someone other than the author
    dissolve with a real model, lowering this priority.
 2. B6: whether to invest in streaming-in-the-replay-loop so unbound mode's
    real economics get measured in-bench (vs. relying on the adapter tests).
+
+## Phase 6 — scribe fidelity: the capture link ✅ (measured 2026-07-06)
+
+Every earlier phase assumed perfect capture (the harness applied the
+generator's own event mapping). T10 (`research/exp_t10_scribe.py`) put a
+LIVE model in the scribe seat on a chatty stream: **capture 100% (60/60
+probed facts), zero noise ops on filler-only turns, end-to-end +26.7%
+[+13.3%, +40.0%] over summarization with capture live, parity with oracle
+capture.** The chain (capture x carry x recall) closes for salient
+conversational facts. JOURNAL Entry 11; claim C19.
+
+**Next (T11 — unsalient capture):** the untested capture class is values
+that only ever appear inside tool output (a port in a stack trace, a hash
+in a diff) and are never restated in prose. Extend the scenario with
+tool-output events whose ground truth appears only in a machine blob, and
+measure whether the scribe still catches them. This is the most likely
+place for the theory to break next.
