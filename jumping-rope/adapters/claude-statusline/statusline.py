@@ -190,6 +190,37 @@ def _ansi(rgb: tuple[int, int, int]) -> str:
 
 RESET = "\x1b[0m"
 DIM = "\x1b[38;2;74;95;134m"
+HOT = "\x1b[38;2;235;242;255m"  # white-hot: a write just landed
+FLASH_S = 6.0  # how long a write stays visibly flagged
+
+
+def _write_flash(rope: str, tokens: int, now: float) -> tuple[int, bool]:
+    """Detect rope growth between refreshes: (delta, fresh).
+
+    A tiny state file beside the rope remembers the last seen size. When the
+    size changes, the delta is flagged for FLASH_S seconds — the gauge shows
+    a bright +N and burns the bar's leading cell white, so every write is
+    visible even when the fill moves less than one cell.
+    """
+    state_path = os.path.join(os.path.dirname(rope), ".gauge-state")
+    prev = None
+    try:
+        prev = json.load(open(state_path, encoding="utf-8"))
+    except (OSError, ValueError):
+        pass
+    if prev is None:
+        prev = {"size": tokens, "ts": 0.0, "delta": 0}  # first sight: no flash
+    elif tokens != prev.get("size"):
+        prev = {"size": tokens, "ts": now, "delta": tokens - int(prev.get("size", tokens))}
+    else:
+        fresh = prev.get("delta", 0) != 0 and (now - prev.get("ts", 0)) < FLASH_S
+        return int(prev.get("delta", 0)), fresh
+    try:
+        json.dump(prev, open(state_path, "w", encoding="utf-8"))
+    except OSError:
+        pass
+    fresh = prev["delta"] != 0 and (now - prev["ts"]) < FLASH_S
+    return int(prev["delta"]), fresh
 
 
 def _human(n: int) -> str:
@@ -227,6 +258,8 @@ def render(info: dict, now: float | None = None) -> str:
     jumps = _parse_meta(text)
     unbound = _opt("JROPE_MODE", cfg).lower() == "unbound"
     budget = int(_opt("JROPE_BUDGET", cfg))
+    delta, fresh = _write_flash(rope, tokens, now)
+    tick = f" {HOT}{'+' if delta > 0 else ''}{delta}{RESET}" if fresh else ""
 
     if unbound:
         # no ceiling — scale color by absolute size tiers, gentle pulse
@@ -234,7 +267,7 @@ def render(info: dict, now: float | None = None) -> str:
         base = _fill_color(fill)
         b = _pulse(fill * 0.6, now)
         col = _ansi(tuple(round(c * b) for c in base))
-        return (f"{lead(col)}{col} {_human(tokens)} tok ∞{RESET} "
+        return (f"{lead(col)}{col} {_human(tokens)} tok ∞{RESET}{tick} "
                 f"{DIM}unbound · j{jumps}{RESET}")
 
     fill = tokens / budget
@@ -242,11 +275,16 @@ def render(info: dict, now: float | None = None) -> str:
     base = _fill_color(fill)
     b = _pulse(min(fill, 1.05), now)
     col = _ansi(tuple(round(c * b) for c in base))
-    bar = col + FILLED * filled + DIM + EMPTY * (BAR_W - filled) + RESET
+    if fresh and filled > 0:
+        # the newest cell burns white while the write is fresh
+        bar = (col + FILLED * (filled - 1) + HOT + FILLED
+               + DIM + EMPTY * (BAR_W - filled) + RESET)
+    else:
+        bar = col + FILLED * filled + DIM + EMPTY * (BAR_W - filled) + RESET
     over = f" {_ansi((239,68,68))}JUMP!{RESET}" if fill >= 1.0 else ""
     pct = f"{col}{min(fill,1.0)*100:.0f}%{RESET}"
     return (f"{lead(col)} {bar} {col}{_human(tokens)}{RESET}{DIM}/{_human(budget)}{RESET} "
-            f"{pct}{over} {DIM}j{jumps}{RESET}")
+            f"{pct}{over}{tick} {DIM}j{jumps}{RESET}")
 
 
 if __name__ == "__main__":

@@ -12,6 +12,12 @@ when there's headroom, a fast red flicker when it's about to jump.
 🪢| 12.4k tok ∞ unbound · j7               ← unbound mode
 ```
 
+Every WRITE to the rope is visible too: when the ledger grows, the gauge
+flashes the token delta (`+12`) in white-hot and the bar's newest cell burns
+white for ~6 seconds — the rope visibly ticks as facts are recorded, even
+when the fill moves less than one cell. (State lives in a tiny
+`.gauge-state` file beside the rope.)
+
 The stroke after the emoji rotates `| / ─ \` — the rope whipping around.
 Because Claude Code only refreshes the status line while the session is
 active, the rope visibly spins **while the session is working** and freezes
