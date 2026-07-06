@@ -13,8 +13,21 @@ Wire it up (settings.json):
         "command": "python3 /abs/path/adapters/claude-statusline/statusline.py" } }
 
 Claude Code pipes session JSON on stdin; we use it to find the rope for the
-current workspace. Override the rope path with JROPE_ROPE_PATH, the budget with
-JROPE_BUDGET (default 2000; ignored in unbound mode).
+current workspace. When the per-session convention is in use
+(`.claude/jumprope/sessions/<session_id>/ROPE.md`, as created by the
+`/jumprope-start` command from adapters/claude-commands), each session sees
+only its own rope — concurrent sessions never share a gauge. Otherwise the
+freshest ROPE.md under the workspace is used, as before.
+
+Config, lowest to highest precedence: built-in defaults, an `env` file of
+KEY=VALUE lines next to the rope (`.claude/jumprope/env` and the session
+dir's `env`), then real environment variables:
+
+  JROPE_ROPE_PATH  force a specific rope file
+  JROPE_BUDGET     bound-mode token budget (default 2000)
+  JROPE_MODE       "unbound" for the ∞ readout (default bound)
+  JROPE_EMOJI      gauge glyph (default 🪢)
+  JROPE_ANIMATE    "0" disables the rope-swing animation (default on)
 """
 
 from __future__ import annotations
@@ -28,6 +41,44 @@ import time
 
 BAR_W = 14
 FILLED, EMPTY = "█", "░"
+# rotating stroke = the rope whipping around; refreshes only happen while
+# the session is active, so the rope visibly spins while working
+SPIN = "|/─\\"
+_BRAILLE_BITS = {(0, 0): 1, (0, 1): 2, (0, 2): 4, (1, 0): 8,
+                 (1, 1): 16, (1, 2): 32, (0, 3): 64, (1, 3): 128}
+
+
+def _rope_frames(n: int = 12, w: int = 8, h: int = 4,
+                 amp: float = 2.4) -> tuple[str, ...]:
+    """JROPE_STYLE=drawn: a custom-drawn rope, no holder.
+
+    Braille chars are 2x4 pixel grids, so 4 chars give an 8x4 canvas. Each
+    frame plots the rope's curve y = sin(pi*x/w)*cos(theta) — the front view
+    of a real jump-rope swing: arc over the top, whip past level, arc under
+    the feet, back past level. Adjacent columns are connected so the rope
+    stays one continuous line.
+    """
+    frames = []
+    mid = (h - 1) / 2
+    for k in range(n):
+        theta = 2 * math.pi * k / n
+        ys = [min(h - 1, max(0, round(
+            mid - amp * math.sin(math.pi * (x + 0.5) / w) * math.cos(theta))))
+            for x in range(w)]
+        cells = [0] * (w // 2)
+        for x in range(w):
+            lo = ys[x] if x == 0 else min(ys[x - 1], ys[x])
+            hi = ys[x] if x == 0 else max(ys[x - 1], ys[x])
+            for y in range(lo, hi + 1):
+                cells[x // 2] |= _BRAILLE_BITS[(x % 2, y)]
+        frames.append("".join(chr(0x2800 + c) for c in cells))
+    return tuple(frames)
+
+
+ROPE_FRAMES = _rope_frames()
+ROPE_SLACK = "⣀⣀⣀⣀"  # limp rope on the ground: nothing is swinging it yet
+DEFAULTS = {"JROPE_BUDGET": "2000", "JROPE_MODE": "bound",
+            "JROPE_EMOJI": "🪢", "JROPE_ANIMATE": "1", "JROPE_STYLE": "emoji"}
 
 
 def _read_stdin_json() -> dict:
@@ -40,13 +91,24 @@ def _read_stdin_json() -> dict:
 
 def _cwd(info: dict) -> str:
     ws = info.get("workspace") or {}
-    return (ws.get("current_dir") or info.get("cwd") or os.getcwd())
+    return (ws.get("project_dir") or ws.get("current_dir")
+            or info.get("cwd") or os.getcwd())
 
 
-def _find_rope(cwd: str) -> str | None:
+def _sessions_root(cwd: str) -> str:
+    return os.path.join(cwd, ".claude", "jumprope", "sessions")
+
+
+def _find_rope(cwd: str, session_id: str | None = None) -> str | None:
     override = os.environ.get("JROPE_ROPE_PATH")
     if override and os.path.exists(override):
         return override
+    if session_id:
+        scoped = os.path.join(_sessions_root(cwd), session_id, "ROPE.md")
+        if os.path.isfile(scoped):
+            return scoped
+    if os.path.isdir(_sessions_root(cwd)):
+        return None  # per-session convention active: never show another session's rope
     candidates: list[str] = []
     for pat in ("ROPE.md", ".jumprope/**/ROPE.md", ".claude/jumprope/**/ROPE.md",
                 ".jumprope/ROPE.md", "**/ROPE.md"):
@@ -57,14 +119,38 @@ def _find_rope(cwd: str) -> str | None:
     return max(candidates, key=os.path.getmtime)  # freshest rope
 
 
+def _file_cfg(cwd: str, session_id: str | None) -> dict[str, str]:
+    """KEY=VALUE `env` files: repo-wide, then per-session (later wins)."""
+    cfg: dict[str, str] = {}
+    paths = [os.path.join(cwd, ".claude", "jumprope", "env")]
+    if session_id:
+        paths.append(os.path.join(_sessions_root(cwd), session_id, "env"))
+    for path in paths:
+        if not os.path.isfile(path):
+            continue
+        try:
+            for ln in open(path, encoding="utf-8"):
+                ln = ln.strip()
+                if ln and not ln.startswith("#") and "=" in ln:
+                    key, val = ln.split("=", 1)
+                    cfg[key.strip()] = val.strip()
+        except OSError:
+            pass
+    return cfg
+
+
+def _opt(name: str, cfg: dict[str, str]) -> str:
+    return os.environ.get(name) or cfg.get(name) or DEFAULTS[name]
+
+
 def _est_tokens(text: str) -> int:
     # cheap, dependency-free estimate (~4 chars/token) — good enough for a gauge.
     return max(1, round(len(text) / 4))
 
 
-def _parse_meta(text: str) -> tuple[int, bool]:
-    """Return (jump_count, unbound) sniffed from the rope header if present."""
-    jumps, unbound = 0, False
+def _parse_meta(text: str) -> int:
+    """Return the jump count sniffed from the rope header if present."""
+    jumps = 0
     first = text.split("\n", 1)[0]
     for tok in first.replace("|", " ").split():
         if tok.startswith("j:"):
@@ -72,8 +158,7 @@ def _parse_meta(text: str) -> tuple[int, bool]:
                 jumps = int(tok[2:])
             except ValueError:
                 pass
-    unbound = os.environ.get("JROPE_MODE", "").lower() == "unbound"
-    return jumps, unbound
+    return jumps
 
 
 def _lerp(a, b, t):
@@ -105,6 +190,37 @@ def _ansi(rgb: tuple[int, int, int]) -> str:
 
 RESET = "\x1b[0m"
 DIM = "\x1b[38;2;74;95;134m"
+HOT = "\x1b[38;2;235;242;255m"  # white-hot: a write just landed
+FLASH_S = 6.0  # how long a write stays visibly flagged
+
+
+def _write_flash(rope: str, tokens: int, now: float) -> tuple[int, bool]:
+    """Detect rope growth between refreshes: (delta, fresh).
+
+    A tiny state file beside the rope remembers the last seen size. When the
+    size changes, the delta is flagged for FLASH_S seconds — the gauge shows
+    a bright +N and burns the bar's leading cell white, so every write is
+    visible even when the fill moves less than one cell.
+    """
+    state_path = os.path.join(os.path.dirname(rope), ".gauge-state")
+    prev = None
+    try:
+        prev = json.load(open(state_path, encoding="utf-8"))
+    except (OSError, ValueError):
+        pass
+    if prev is None:
+        prev = {"size": tokens, "ts": 0.0, "delta": 0}  # first sight: no flash
+    elif tokens != prev.get("size"):
+        prev = {"size": tokens, "ts": now, "delta": tokens - int(prev.get("size", tokens))}
+    else:
+        fresh = prev.get("delta", 0) != 0 and (now - prev.get("ts", 0)) < FLASH_S
+        return int(prev.get("delta", 0)), fresh
+    try:
+        json.dump(prev, open(state_path, "w", encoding="utf-8"))
+    except OSError:
+        pass
+    fresh = prev["delta"] != 0 and (now - prev["ts"]) < FLASH_S
+    return int(prev["delta"]), fresh
 
 
 def _human(n: int) -> str:
@@ -113,16 +229,37 @@ def _human(n: int) -> str:
 
 def render(info: dict, now: float | None = None) -> str:
     now = time.time() if now is None else now
-    rope = _find_rope(_cwd(info))
+    cwd = _cwd(info)
+    sid = info.get("session_id")
+    cfg = _file_cfg(cwd, sid)
+    emoji = _opt("JROPE_EMOJI", cfg)
+    animate = _opt("JROPE_ANIMATE", cfg) != "0"
+    drawn = _opt("JROPE_STYLE", cfg).lower() == "drawn"
+    idle = ROPE_SLACK if drawn else emoji
+
+    def lead(col: str) -> str:
+        """The gauge glyph: emoji+stroke, or the drawn rope mid-swing."""
+        if drawn:
+            frame = ROPE_FRAMES[int(now * 12) % len(ROPE_FRAMES)] if animate \
+                else ROPE_FRAMES[0]
+            return f"{col}{frame}{RESET}"
+        return emoji + (SPIN[int(now * 8) % len(SPIN)] if animate else "")
+
+    rope = _find_rope(cwd, sid)
     if rope is None:
-        return f"{DIM}🪢 no rope yet{RESET}"
+        hint = ("no rope — /jumprope-start"
+                if os.path.isdir(_sessions_root(cwd)) else "no rope yet")
+        return f"{DIM}{idle} {hint}{RESET}"
     try:
         text = open(rope, encoding="utf-8", errors="ignore").read()
     except OSError:
-        return f"{DIM}🪢 rope unreadable{RESET}"
+        return f"{DIM}{idle} rope unreadable{RESET}"
     tokens = _est_tokens(text)
-    jumps, unbound = _parse_meta(text)
-    budget = int(os.environ.get("JROPE_BUDGET", "2000"))
+    jumps = _parse_meta(text)
+    unbound = _opt("JROPE_MODE", cfg).lower() == "unbound"
+    budget = int(_opt("JROPE_BUDGET", cfg))
+    delta, fresh = _write_flash(rope, tokens, now)
+    tick = f" {HOT}{'+' if delta > 0 else ''}{delta}{RESET}" if fresh else ""
 
     if unbound:
         # no ceiling — scale color by absolute size tiers, gentle pulse
@@ -130,7 +267,7 @@ def render(info: dict, now: float | None = None) -> str:
         base = _fill_color(fill)
         b = _pulse(fill * 0.6, now)
         col = _ansi(tuple(round(c * b) for c in base))
-        return (f"{col}🪢 {_human(tokens)} tok ∞{RESET} "
+        return (f"{lead(col)}{col} {_human(tokens)} tok ∞{RESET}{tick} "
                 f"{DIM}unbound · j{jumps}{RESET}")
 
     fill = tokens / budget
@@ -138,11 +275,16 @@ def render(info: dict, now: float | None = None) -> str:
     base = _fill_color(fill)
     b = _pulse(min(fill, 1.05), now)
     col = _ansi(tuple(round(c * b) for c in base))
-    bar = col + FILLED * filled + DIM + EMPTY * (BAR_W - filled) + RESET
+    if fresh and filled > 0:
+        # the newest cell burns white while the write is fresh
+        bar = (col + FILLED * (filled - 1) + HOT + FILLED
+               + DIM + EMPTY * (BAR_W - filled) + RESET)
+    else:
+        bar = col + FILLED * filled + DIM + EMPTY * (BAR_W - filled) + RESET
     over = f" {_ansi((239,68,68))}JUMP!{RESET}" if fill >= 1.0 else ""
     pct = f"{col}{min(fill,1.0)*100:.0f}%{RESET}"
-    return (f"🪢 {bar} {col}{_human(tokens)}{RESET}{DIM}/{_human(budget)}{RESET} "
-            f"{pct}{over} {DIM}j{jumps}{RESET}")
+    return (f"{lead(col)} {bar} {col}{_human(tokens)}{RESET}{DIM}/{_human(budget)}{RESET} "
+            f"{pct}{over}{tick} {DIM}j{jumps}{RESET}")
 
 
 if __name__ == "__main__":
