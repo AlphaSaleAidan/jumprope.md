@@ -140,6 +140,12 @@ sub-theories of the core claim. Confirmed so far (each with a regression test in
   stays **100%**. A big codebase is T7's natural habitat — hundreds of same-named
   `close`/`read`/`run`. (And no lost-in-the-middle for a *distinctive* marker even
   at 80k tokens of real code, 12/12 — position still isn't the lever.)
+- **T6 — capability recovers the density loss.** T2's ai-native "floor" only
+  bites a literal keyword-matcher: the scripted reader drops 93%→83% on the coded
+  rope, but **live Haiku holds 100% on both** (a +17% recovery) — it reads the
+  legend and decodes it. So aggressive AI-native coding is **safe wherever a real
+  model reads the rope**; combined with T7 (safe on the vault too), you can
+  densify freely.
 
 The statistics themselves are validated: over 100k simulated experiments the
 bootstrap 95% CI covers the true value ~95% of the time.

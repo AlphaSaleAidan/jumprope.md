@@ -156,7 +156,7 @@ LIVE model in the scribe seat on a chatty stream: **capture 100% (60/60
 probed facts), zero noise ops on filler-only turns, end-to-end +26.7%
 [+13.3%, +40.0%] over summarization with capture live, parity with oracle
 capture.** The chain (capture x carry x recall) closes for salient
-conversational facts. JOURNAL Entry 10; claim C18.
+conversational facts. JOURNAL Entry 11; claim C19.
 
 **Next (T11 — unsalient capture):** the untested capture class is values
 that only ever appear inside tool output (a port in a stack trace, a hash

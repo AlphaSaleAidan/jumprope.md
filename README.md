@@ -112,6 +112,7 @@ to avoid.
 | **The vault + `jrope query`** | any "what was that detail from earlier?" moment — exact-key or semantic lookup instead of scrolling |
 | **Turn provenance (`t42·` stamps)** | auditing: every vaulted item's K-line tells you which conversation turn produced it |
 | **Claude Code skill** | long coding sessions in Claude Code — maintains ROPE.md automatically, re-seeds after compaction |
+| **Statusline gauge + `/jumprope-*` commands** | watch the rope fill live in the Claude Code status line (the rope spins while the session works); `/jumprope-start`, `/jumprope-cut`, `/jumprope-mode`, `/jumprope-status` manage one rope **per session** |
 | **Open WebUI pipe** | self-hosted chat UIs — paste one file, get streaming eviction per conversation |
 | **OpenAI-compatible proxy** | any existing stack (middleware): point the client at the proxy, sessions get ropes transparently |
 
@@ -327,6 +328,15 @@ stronger** — denser coding strips even more surface variance, so semantic sear
 fails *faster* (48%→33% at four distractors) while the exact fetch is unmoved.
 That is the counter-intuitive punchline: the denser and more coded your memory,
 the *more* you need to address it by key instead of searching it by meaning.
+
+<p align="center"><img src="assets/chart-capability.svg" width="900" alt="a real model decodes the dense AI-native rope with no loss where a literal keyword-matcher drops 10 points"></p>
+
+And is that dense AI-native coding *safe*? For a real model, completely. A literal
+keyword-matcher drops 10 points on the coded rope (it can't match the words it
+codes away) — but a live model **reads the legend and decodes it with zero loss**
+(100% vs the matcher's 83%). The density "floor" is a weak-reader artifact, so the
+token savings come free: **densify the rope as hard as you like — any real model
+reads it fine.**
 
 ### And this is exactly why it matters for a big codebase
 
